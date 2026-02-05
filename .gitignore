@@ -12,7 +12,6 @@ Icon?
 # Composer
 composer.phar
 /vendor/
-/app/vendor/
 /vendor-bin/**/vendor/
 
 # Environment files (keep example files tracked)
@@ -21,7 +20,6 @@ node_modules/
 .DS_Store
 .env.*
 !.env.example
-!/app/.env.example
 
 # Logs and caches
 *.log
@@ -31,9 +29,6 @@ temp/
 cache/
 storage/
 var/
-app/storage/
-app/cache/
-app/var/
 .phpunit.result.cache
 coverage/
 
@@ -42,4 +37,3 @@ node_modules/
 
 # Docker overrides (optional local overrides)
 docker-compose.override.yml
-
