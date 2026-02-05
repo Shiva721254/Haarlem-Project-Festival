@@ -202,7 +202,7 @@ class ProductController
     }
 
     // POST
-    public function rateProdcut($vars = [])
+    public function rateProduct($vars = [])
     {
         if (!isset($_SESSION['UserId'])){
             header("Location: /showLogin");
