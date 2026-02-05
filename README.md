@@ -1,65 +1,67 @@
-# Docker template for PHP projects
-This repository provides a starting template for PHP application development.
+# Haarlem Festival – Web Development Project
 
-It contains:
-* NGINX webserver
-* PHP FastCGI Process Manager with PDO MySQL support
-* MariaDB (GPL MySQL fork)
-* PHPMyAdmin
-* Composer
-* Composer package [nikic/fast-route](https://github.com/nikic/FastRoute) for routing
+## Project Overview
+This project is a web application developed for the **Haarlem Festival**, created as part of the Web Development course.  
+The goal is to deliver a **data-driven, accessible, and maintainable festival website** with a **Content Management System (CMS)** that allows administrators to manage festival content dynamically.
 
-## Setup
+The application follows a **custom MVC architecture**, without the use of external frameworks, in line with course guidelines.
 
-1. Install Docker Desktop on Windows or Mac, or Docker Engine on Linux.
-1. Clone the project
+---
 
-## Usage
+## Key Features
+### Public Website
+- Home page with featured events and festival information
+- Event listings and event detail pages
+- Artist and venue information
+- Program overview and scheduling
+- Responsive and accessible design
 
-In a terminal, from the cloned project folder, run:
-```bash
-docker compose up
-```
+### CMS (Admin Panel)
+- Secure admin authentication
+- Create, edit, and delete events
+- Upload and manage event images
+- Edit homepage content blocks
+- Manage festival-related data (events, venues, artists)
 
-### Composer Autoload
+---
 
-This template is configured to use Composer for PSR-4 autoloading:
+## Technology Stack
+- **PHP** (custom MVC, no frameworks)
+- **MySQL / MariaDB**
+- **HTML5 / CSS3**
+- **JavaScript** (minimal, progressive enhancement only)
+- **PDO** for database access
+- **Docker** (PHP + Nginx setup)
 
-- Namespace `App\\` is mapped to `app/src/`.
+---
 
-To install dependencies and generate the autoloader, run:
+## Project Structure
+The project uses a clear MVC-based structure with separation of concerns:
 
-```bash
-docker compose run --rm php composer install
-```
+```text
+app/
+├─ Config/            # Application configuration
+├─ Controllers/       # Controllers (public + admin)
+├─ Core/              # Core framework classes (Router, DB, Auth, etc.)
+├─ Middleware/        # Auth and admin middleware
+├─ Repositories/      # Database access (PDO)
+├─ Services/          # Reusable business logic (uploads, tickets)
+├─ Views/             # Views (public and admin)
+public/
+├─ index.php          # Application entry point
+├─ assets/            # CSS, JS, images
+├─ uploads/           # Uploaded event images
+routes/
+├─ web.php            # Public routes
+├─ admin.php          # Admin/CMS routes
+database/
+├─ schema.sql         # Database schema
+├─ seed.sql           # Sample data
+storage/
+├─ logs/
+├─ cache/
 
-If you add new classes or change namespaces, regenerate the autoloader:
-
-```bash
-docker compose run --rm php composer dump-autoload
-```
-
-Example usage is wired in `app/public/index.php` and a sample class exists at `app/src/hello.php`.
-
-### NGINX
-
-NGINX will now serve files in the app/public folder.
-
-Go to [http://localhost/hello.php](http://localhost/hello.php). You should see a hello world message.
-
-### PHPMyAdmin
-
-PHPMyAdmin provides basic database administration. It is accessible at [localhost:8080](localhost:8080).
-
-Credentials are defined in `docker-compose.yml`. They are: developer/secret123
 
 
-### Stopping the docker container
 
-If you want to stop the containers, press Ctrl+C. 
-
-Or run:
-```bash
-docker compose down
-```
 
