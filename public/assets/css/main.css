@@ -35,3 +35,13 @@ body {
   border: 1px solid #ddd;
   border-radius: 12px;
 }
+
+.flash {
+  max-width: 1100px;
+  margin: 16px auto 0;
+  padding: 12px 16px;
+  border-radius: 10px;
+}
+
+.flash-success { background: #e9f9ee; border: 1px solid #9be3b0; }
+.flash-error   { background: #fdecec; border: 1px solid #f1a3a3; }
