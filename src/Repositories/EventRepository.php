@@ -62,31 +62,34 @@ final class EventRepository extends Repository
     ]);
 }
 
-
-public function allForSchedule(?string $category): array
-{
-    if ($category === null || $category === '') {
-        $sql = "SELECT id, title, event_date, category
-                FROM events
-                ORDER BY event_date ASC, id ASC";
-        return $this->all($sql);
-    }
-
-    $sql = "SELECT id, title, event_date, category
-            FROM events
-            WHERE category = :category
-            ORDER BY event_date ASC, id ASC";
-
-    return $this->all($sql, ['category' => $category]);
-}
-
-
-
-
-
     public function deleteById(int $id): int
     {
         $sql = "DELETE FROM events WHERE id = :id";
         return $this->exec($sql, ['id' => $id]);
     }
+
+
+
+
+   public function allForSchedule(?string $category): array
+    {
+        if ($category === null || $category === '') {
+            $sql = "SELECT id, title, event_date, category
+                    FROM events
+                    ORDER BY event_date ASC, id ASC";
+            return $this->all($sql);
+        }
+
+        $sql = "SELECT id, title, event_date, category
+                FROM events
+                WHERE category = :category
+                ORDER BY event_date ASC, id ASC";
+
+        return $this->all($sql, ['category' => $category]);
+    }
+
+
+
+
+
 }
