@@ -1,66 +1,64 @@
 <?php
 declare(strict_types=1);
 
-/** @var array<int, array<string, mixed>> $events */
+/** @var array<int, array{id:int,title:string,event_date:string,category?:string}> $events */
 
-function e(string $value): string {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+function h(string $s): string {
+    return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 }
+?>
 
-function fmtDate(string $date): string {
-    // input: YYYY-MM-DD
-    $ts = strtotime($date);
-    return $ts ? date('D, d M Y', $ts) : $date;
-}
-
-$content = '';
-
-// Hero
-$content .= '
 <section class="hero">
-  <h1>Dance Festival Haarlem</h1>
-  <p>Discover events, artists, and schedules across the city. Built for fast browsing and easy planning — aligned with our Figma design.</p>
-  <div class="hero-actions">
-    <a class="btn primary" href="/schedule">View Schedule</a>
-    <a class="btn" href="/tickets">Get Tickets</a>
-  </div>
-</section>
-';
+    <div class="hero-inner">
+        <div class="hero-text">
+            <h1>Haarlem Festival</h1>
+            <p class="lead">
+                Discover music, culture, and family-friendly experiences across Haarlem.
+            </p>
 
-// Upcoming events
-$content .= '
-<section class="section">
-  <div class="section-head">
-    <h2>Upcoming events</h2>
-    <a href="/schedule">See all →</a>
-  </div>
-';
+            <div class="hero-cta">
+                <a class="btn btn-primary" href="/schedule">Explore schedule</a>
+             <?php if (\App\Framework\Auth::isAdmin()): ?>
+    <a class="btn btn-outline" href="/admin/events">Admin events</a>
+<?php endif; ?>
 
-if (empty($events)) {
-    $content .= '<p class="muted">No events found.</p></section>';
-} else {
-    $content .= '<div class="grid">';
-    foreach ($events as $ev) {
-        $title = e((string)($ev['title'] ?? ''));
-        $cat   = e((string)($ev['category'] ?? ''));
-        $date  = e(fmtDate((string)($ev['event_date'] ?? '')));
-        $venue = e((string)($ev['venue'] ?? ''));
-        $price = $ev['price'] !== null ? number_format((float)$ev['price'], 2) : null;
-
-        $content .= '
-          <article class="card">
-            <span class="badge">' . $cat . '</span>
-            <h3>' . $title . '</h3>
-            <div class="meta">
-              <div><strong>Date:</strong> ' . $date . '</div>
-              ' . ($venue !== '' ? '<div><strong>Venue:</strong> ' . $venue . '</div>' : '') . '
-              ' . ($price !== null ? '<div class="price">€ ' . e($price) . '</div>' : '') . '
             </div>
-          </article>
-        ';
-    }
-    $content .= '</div></section>';
-}
+        </div>
 
-$title = 'Home • Haarlem Festival';
-return require __DIR__ . '/../layouts/main.php';
+        <div class="hero-panel">
+    <div class="hero-panel-title">Next events</div>
+
+    <?php if (empty($events)): ?>
+        <p class="muted" style="margin:0;">No upcoming events yet.</p>
+    <?php else: ?>
+        <ul class="hero-list">
+            <?php foreach (array_slice($events, 0, 3) as $e): ?>
+                <li>
+                    <span class="hero-dot"></span>
+                    <span class="hero-item-title"><?= h((string)$e['title']) ?></span>
+                    <span class="hero-item-date"><?= h((string)$e['event_date']) ?></span>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
+</div>
+
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-head">
+        <h2>Featured events</h2>
+        <a class="link" href="/schedule">See all</a>
+    </div>
+
+    <?php if (empty($events)): ?>
+        <p>No events available yet.</p>
+    <?php else: ?>
+        <div class="grid">
+            <?php foreach (array_slice($events, 0, 6) as $event): ?>
+                <?php require __DIR__ . '/../components/event-card.php'; ?>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</section>

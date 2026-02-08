@@ -12,7 +12,6 @@ final class ScheduleController
     {
         $selected = trim((string)($_GET['category'] ?? ''));
 
-        // Validate selected category against allowed list
         $allowed = \App\Config\EventCategories::all();
         if ($selected !== '' && !in_array($selected, $allowed, true)) {
             $selected = '';
@@ -21,14 +20,12 @@ final class ScheduleController
         $repo = new EventRepository();
         $events = $repo->allForSchedule($selected === '' ? null : $selected);
 
-        // Group by date
         $grouped = [];
         foreach ($events as $e) {
             $date = (string)($e['event_date'] ?? '');
             $grouped[$date][] = $e;
         }
 
-        // Render content (schedule view)
         ob_start();
         $groups = $grouped;
         $categories = $allowed;
@@ -36,7 +33,6 @@ final class ScheduleController
         require __DIR__ . '/../Views/schedule/index.php';
         $content = (string)ob_get_clean();
 
-        // Render layout (app.php uses $title + $content)
         ob_start();
         $title = 'Schedule';
         require __DIR__ . '/../Views/layout/app.php';

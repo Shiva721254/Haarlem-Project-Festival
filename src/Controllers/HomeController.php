@@ -1,6 +1,29 @@
-public function schedule(): string
+<?php
+declare(strict_types=1);
+
+namespace App\Controllers;
+
+use App\Framework\Response;
+use App\Services\EventService;
+
+final class HomeController
 {
-    $title = 'Schedule • Haarlem Festival';
-    $content = '<h1>Schedule</h1><p class="muted">Next: render schedule from events table.</p>';
-    return require __DIR__ . '/../Views/layouts/main.php';
+    public function index(): Response
+    {
+        $service = new EventService();
+        $events  = $service->homepageEvents();
+
+        // Render page content
+        ob_start();
+        require __DIR__ . '/../Views/home/index.php';
+        $content = (string)ob_get_clean();
+
+        // Render layout (app.php uses $title + $content)
+        ob_start();
+        $title = 'Home';
+        require __DIR__ . '/../Views/layout/app.php';
+        $html = (string)ob_get_clean();
+
+        return Response::html($html);
+    }
 }

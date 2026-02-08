@@ -35,6 +35,7 @@ $action = $isEdit
 <?php endif; ?>
 
 <form method="POST" action="<?= h($action) ?>">
+     <?= \App\Framework\Csrf::field() ?>
 
     <!-- Title -->
     <div style="margin:10px 0;">

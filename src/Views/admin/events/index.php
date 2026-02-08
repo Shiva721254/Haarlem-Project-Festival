@@ -33,9 +33,17 @@ function h(string $s): string {
           <td>
             <a href="/admin/events/edit?id=<?= (int)$e['id'] ?>">Edit</a>
 
-            <form method="POST" action="/admin/events/delete?id=<?= (int)$e['id'] ?>" style="display:inline;">
-              <button type="submit" onclick="return confirm('Delete this event?')">Delete</button>
-            </form>
+            <form method="POST"
+      action="/admin/events/delete?id=<?= (int)$e['id'] ?>"
+      style="display:inline;">
+
+  <?= \App\Framework\Csrf::field() ?>
+
+  <button type="submit" onclick="return confirm('Delete this event?')">
+    Delete
+  </button>
+</form>
+
           </td>
         </tr>
       <?php endforeach; ?>
