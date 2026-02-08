@@ -27,4 +27,15 @@ final class Csrf
 
         return hash_equals($sessionToken, $provided);
     }
+
+    public static function verifyFromPost(string $field = 'csrf_token'): bool
+{
+    $token = $_POST[$field] ?? null;
+    return self::verify(is_string($token) ? $token : null);
+}
+
+
+
+
+    
 }

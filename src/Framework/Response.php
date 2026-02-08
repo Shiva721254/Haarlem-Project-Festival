@@ -37,6 +37,17 @@ final class Response
         ]);
     }
 
+
+public static function redirect(string $to, int $status = 302): self
+{
+    // For redirects, the body is typically empty
+    return (new self('', $status))
+        ->withHeader('Location', $to);
+}
+
+
+
+
     public function withHeader(string $name, string $value): self
     {
         $clone = clone $this;

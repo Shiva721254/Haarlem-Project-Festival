@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 /** @var array<int, array{id:int,title:string,event_date:string,category?:string}> $events */
 
-function h(string $s): string {
-    return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
-}
+
 ?>
 
 <section class="hero">

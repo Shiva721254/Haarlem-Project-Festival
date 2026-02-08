@@ -3,9 +3,6 @@ declare(strict_types=1);
 
 /** @var array{id:int,title:string,event_date:string,category?:string} $event */
 
-function h(string $s): string {
-    return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
-}
 
 $title = (string)($event['title'] ?? '');
 $date  = (string)($event['event_date'] ?? '');
