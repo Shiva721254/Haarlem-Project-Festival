@@ -12,8 +12,8 @@ use App\Framework\Flash;
 
 $router = new Router();
 
-$webRoutes   = require __DIR__ . '/../src/routes/web.php';
-$adminRoutes = require __DIR__ . '/../src/routes/admin.php';
+$webRoutes   = require __DIR__ . '/../routes/web.php';
+$adminRoutes = require __DIR__ . '/../routes/admin.php';
 
 foreach ([$webRoutes, $adminRoutes] as $routes) {
     foreach ($routes as $route) {

@@ -21,7 +21,7 @@ final class EventAdminController
         $content = (string)ob_get_clean();
 
         ob_start();
-        require __DIR__ . '/../../Views/layout/app.php';
+        require __DIR__ . '/../../../resources/views/layout/app.php';
         $html = (string)ob_get_clean();
 
         return Response::html($html);
@@ -38,7 +38,7 @@ final class EventAdminController
         $events = $repo->allOrderedByDate();
 
         return $this->render(
-            __DIR__ . '/../../Views/admin/events/index.php',
+            __DIR__ . '/../../../resources/views/admin/events/index.php',
             ['events' => $events],
             'Admin • Events'
         );
@@ -47,7 +47,7 @@ final class EventAdminController
     public function create(): Response
     {
         return $this->render(
-            __DIR__ . '/../../Views/admin/events/form.php',
+            __DIR__ . '/../../../resources/views/admin/events/form.php',
             [
                 'mode' => 'create',
                'event' => ['title' => '', 'event_date' => '', 'category' => ''],
@@ -70,7 +70,7 @@ final class EventAdminController
 
     if ($errors) {
         return $this->render(
-            __DIR__ . '/../../Views/admin/events/form.php',
+            __DIR__ . '/../../../resources/views/admin/events/form.php',
             [
                 'mode' => 'create',
                 'event' => ['title' => $title, 'event_date' => $date, 'category' => $category],
@@ -99,7 +99,7 @@ final class EventAdminController
         if ($event === null) return Response::html('Not Found', 404);
 
         return $this->render(
-            __DIR__ . '/../../Views/admin/events/form.php',
+            __DIR__ . '/../../../resources/views/admin/events/form.php',
             [
                 'mode' => 'edit',
                 'event' => $event,
@@ -126,7 +126,7 @@ final class EventAdminController
 
         if ($errors) {
             return $this->render(
-                __DIR__ . '/../../Views/admin/events/form.php',
+                __DIR__ . '/../../../resources/views/admin/events/form.php',
                 [
                     'mode' => 'edit',
                     'event' => ['id' => $id, 'title' => $title, 'event_date' => $date, 'category' => $category],

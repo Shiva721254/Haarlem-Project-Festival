@@ -4,6 +4,7 @@ declare(strict_types=1);
 use App\Controllers\HomeController;
 use App\Controllers\ScheduleController;
 use App\Controllers\AuthController;
+use App\Controllers\ContactController;
 
 return [
     ['GET',  '/',         [HomeController::class, 'index']],

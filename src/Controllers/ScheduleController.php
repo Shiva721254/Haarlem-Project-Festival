@@ -30,12 +30,12 @@ final class ScheduleController
         $groups = $grouped;
         $categories = $allowed;
         $selectedCategory = $selected;
-        require __DIR__ . '/../Views/schedule/index.php';
+        require __DIR__ . '/../../resources/views/schedule/index.php';
         $content = (string)ob_get_clean();
 
         ob_start();
         $title = 'Schedule';
-        require __DIR__ . '/../Views/layout/app.php';
+        require __DIR__ . '/../../resources/views/layout/app.php';
         $html = (string)ob_get_clean();
 
         return Response::html($html);

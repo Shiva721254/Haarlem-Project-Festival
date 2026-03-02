@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Render a PHP view from src/Views.
+ * Render a PHP view from resources/views.
  *
  * Example: view('auth/login', ['error' => '...'])
  */
@@ -16,7 +16,7 @@ if (!function_exists('h')) {
 
 function view(string $name, array $data = []): string
 {
-    $base = __DIR__ . '/../Views/';
+    $base = __DIR__ . '/../../resources/views/';
     $path = $base . str_replace(['..', '\\'], ['', '/'], $name) . '.php';
 
     if (!is_file($path)) {
