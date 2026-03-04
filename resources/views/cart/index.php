@@ -35,8 +35,7 @@ declare(strict_types=1);
                         <form method="POST" action="/cart/update" style="display:inline-flex; gap:6px; align-items:center; justify-content:flex-end;">
                             <?= \App\Framework\Csrf::field() ?>
                             <input type="hidden" name="ticket_id" value="<?= (int)$line['ticket_id'] ?>">
-                            <input type="number" name="quantity" min="0" max="10" value="<?= (int)$line['quantity'] ?>" style="width:60px;">
-                            <button type="submit">Update</button>
+                            <input type="number" name="quantity" min="0" max="10" value="<?= (int)$line['quantity'] ?>" style="width:60px;" onchange="this.form.submit();">
                         </form>
                     </td>
                     <td style="padding:8px; border-bottom:1px solid #f0f0f0; text-align:right;">€<?= number_format((float)$line['price'], 2) ?></td>
