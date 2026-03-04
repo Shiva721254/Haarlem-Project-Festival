@@ -115,6 +115,20 @@ class OrderRepository extends Repository
     }
 
     /**
+     * Find all orders
+     *
+     * @return array
+     */
+    public function findAll(): array
+    {
+        return $this->all('
+            SELECT *
+            FROM orders
+            ORDER BY created_at DESC
+        ', []);
+    }
+
+    /**
      * Find all orders by user ID
      *
      * @param int $user_id

@@ -8,6 +8,7 @@ use App\Controllers\ContactController;
 use App\Controllers\CartController;
 use App\Controllers\PaymentController;
 use App\Controllers\UserOrderController;
+use App\Controllers\TicketVerificationController;
 
 return [
     ['GET',  '/',         [HomeController::class, 'index']],
@@ -27,6 +28,11 @@ return [
     ['GET', '/profile/orders', [UserOrderController::class, 'orders']],
     ['GET', '/profile/orders/view', [UserOrderController::class, 'orderDetail']],  // ?id=1
     ['GET', '/profile/orders/download/{id}', [UserOrderController::class, 'downloadInvoice']],
+
+    // Ticket Verification (Day 6)
+    ['POST', '/ticket/verify', [TicketVerificationController::class, 'verify']],
+    ['POST', '/ticket/mark-used', [TicketVerificationController::class, 'markUsed']],
+    ['GET', '/ticket/status', [TicketVerificationController::class, 'getStatus']],
 
     // Cart
     ['GET', '/cart', [CartController::class, 'show']],

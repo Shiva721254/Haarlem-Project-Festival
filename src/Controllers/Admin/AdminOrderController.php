@@ -16,11 +16,7 @@ final class AdminOrderController
         $repo = new OrderRepository();
         
         // Get all orders sorted by recent first
-        $orders = $repo->all('
-            SELECT id, user_id, customer_email, customer_name, total_amount, status, created_at
-            FROM orders
-            ORDER BY created_at DESC
-        ', []);
+        $orders = $repo->findAll();
 
         return Response::html(view('admin/orders/index', [
             'title' => 'Order Management',

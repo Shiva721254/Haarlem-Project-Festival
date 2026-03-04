@@ -6,7 +6,7 @@ namespace App\Controllers\Admin;
 use App\Framework\Auth;
 use App\Framework\Response;
 
-final class DashboardController
+final class CheckinController
 {
     public function index(): Response
     {
@@ -15,9 +15,6 @@ final class DashboardController
             return Response::redirect('/login');
         }
 
-        return Response::html(view('admin/dashboard', [
-            'title' => 'Admin Dashboard',
-            'adminName' => Auth::user()['first_name'] ?? Auth::user()['email'],
-        ]));
+        return Response::html(view('admin/checkin'));
     }
 }
