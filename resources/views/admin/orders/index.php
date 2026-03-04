@@ -94,8 +94,7 @@
                                 }
                                 
                                 $date = new DateTime($order['created_at']);
-                                $formattedDate = $date->format('Mar d, Y');
-                                $formattedTime = $date->format('H:i');
+                                $formattedDate = $date->format('d M, H:i');
                             ?>
                             <tr class="table-row">
                                 <td class="col-id">
@@ -118,10 +117,7 @@
                                     </span>
                                 </td>
                                 <td class="col-date">
-                                    <div class="date-column">
-                                        <span class="date-value"><?= h($formattedDate) ?></span>
-                                        <span class="date-time"><?= h($formattedTime) ?></span>
-                                    </div>
+                                    <span class="date-value"><?= h($formattedDate) ?></span>
                                 </td>
                                 <td class="col-actions">
                                     <a href="/admin/orders/detail?id=<?= h($order['id']) ?>" class="action-button view-btn">
@@ -472,22 +468,10 @@
     color: #d13438;
 }
 
-/* Date Column */
-.date-column {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 12px;
-}
-
 .date-value {
     font-weight: 500;
     color: #000;
-}
-
-.date-time {
-    font-size: 11px;
-    color: #999;
+    font-size: 12px;
 }
 
 /* Action Button */
