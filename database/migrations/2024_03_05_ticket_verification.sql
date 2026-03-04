@@ -1,7 +1,7 @@
 -- Day 6: Ticket Verification & QR Scanning
 -- Add columns for ticket status tracking
 
-ALTER TABLE order_items ADD COLUMN is_used BOOLEAN DEFAULT FALSE AFTER is_guest;
+ALTER TABLE order_items ADD COLUMN is_used BOOLEAN DEFAULT FALSE AFTER price_at_purchase;
 ALTER TABLE order_items ADD COLUMN used_at TIMESTAMP NULL AFTER is_used;
 ALTER TABLE order_items ADD COLUMN checked_by_user_id INT NULL AFTER used_at;
 ALTER TABLE order_items ADD FOREIGN KEY (checked_by_user_id) REFERENCES users(id) ON DELETE SET NULL;
