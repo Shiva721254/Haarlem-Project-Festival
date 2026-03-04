@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Framework\Auth;
 use App\Framework\Csrf;
 use App\Framework\Flash;
 use App\Framework\Response;
 use App\Framework\SessionManager;
+use App\Repositories\OrderRepository;
 use App\Repositories\TicketRepository;
 use App\Services\CartService;
 
@@ -180,9 +182,38 @@ final class CartController
             return Response::redirect('/cart');
         }
 
-        return Response::html(view('checkout/index', [
-            'lines' => $lines,
-            'total' => $total,
-        ]));
+        // Create order from cart
+        try {
+            $orderRepo = new OrderRepository();
+            $user = Auth::user();
+            $user_id = $user['id'] ?? null;
+            $customer_email = $user['email'] ?? $_SESSION['guest_email'] ?? '';
+
+            if (!$customer_email) {
+                Flash::set('error', 'Email is required to proceed to checkout.');
+                return Response::redirect('/cart');
+            }
+
+            $customer_name = ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '');
+            $cartItems = CartService::items();
+
+            $order_id = $orderRepo->create(
+                $user_id,
+                $customer_email,
+                trim($customer_name) ?: null,
+                $total,
+                $cartItems
+            );
+
+            return Response::html(view('checkout/index', [
+                'lines' => $lines,
+                'total' => $total,
+                'order_id' => $order_id,
+            ]));
+        } catch (\Exception $e) {
+            error_log('Order creation error: ' . $e->getMessage());
+            Flash::set('error', 'Failed to create order. Please try again.');
+            return Response::redirect('/cart');
+        }
     }
 }

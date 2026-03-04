@@ -7,6 +7,23 @@ declare(strict_types=1);
  * Central initialization and configuration for the Haarlem Festival application.
  */
 
+// Load environment variables from .env file
+if (file_exists(__DIR__ . '/../.env')) {
+    $env_lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($env_lines as $line) {
+        if (str_starts_with(trim($line), '#')) {
+            continue; // Skip comments
+        }
+        [$key, $value] = array_pad(explode('=', $line, 2), 2, '');
+        $key = trim($key);
+        $value = trim($value);
+        if ($key && !isset($_ENV[$key])) {
+            $_ENV[$key] = $value;
+            putenv("$key=$value");
+        }
+    }
+}
+
 // Start session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

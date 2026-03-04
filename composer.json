@@ -11,5 +11,8 @@
     "psr-4": {
       "App\\Tests\\": "tests/"
     }
+  },
+  "require": {
+    "stripe/stripe-php": "^19.4"
   }
 }

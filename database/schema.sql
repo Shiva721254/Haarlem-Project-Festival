@@ -45,3 +45,40 @@ CREATE TABLE IF NOT EXISTS tickets (
   INDEX idx_tickets_event (event_id),
   UNIQUE KEY uniq_event_ticket_type (event_id, ticket_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Orders table (Sprint Day 4)
+CREATE TABLE IF NOT EXISTS orders (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  customer_email VARCHAR(255) NOT NULL,
+  customer_name VARCHAR(255) NULL,
+  total_amount DECIMAL(10,2) NOT NULL,
+  status ENUM('pending', 'completed', 'failed', 'cancelled') DEFAULT 'pending',
+  stripe_payment_intent_id VARCHAR(255) NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_orders_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE SET NULL,
+  INDEX idx_orders_user (user_id),
+  INDEX idx_orders_status (status),
+  INDEX idx_orders_email (customer_email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Order items table (Sprint Day 4)
+CREATE TABLE IF NOT EXISTS order_items (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  order_id INT UNSIGNED NOT NULL,
+  ticket_id INT NOT NULL,
+  quantity INT UNSIGNED NOT NULL DEFAULT 1,
+  price_at_purchase DECIMAL(10,2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_order_items_order
+    FOREIGN KEY (order_id) REFERENCES orders(id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_order_items_ticket
+    FOREIGN KEY (ticket_id) REFERENCES tickets(id)
+    ON DELETE RESTRICT,
+  INDEX idx_order_items_order (order_id),
+  INDEX idx_order_items_ticket (ticket_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

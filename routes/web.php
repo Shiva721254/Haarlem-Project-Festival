@@ -6,6 +6,7 @@ use App\Controllers\ScheduleController;
 use App\Controllers\AuthController;
 use App\Controllers\ContactController;
 use App\Controllers\CartController;
+use App\Controllers\PaymentController;
 
 return [
     ['GET',  '/',         [HomeController::class, 'index']],
@@ -30,6 +31,12 @@ return [
     ['POST', '/cart/remove', [CartController::class, 'remove']],
     ['POST', '/cart/clear', [CartController::class, 'clear']],
     ['GET', '/checkout', [CartController::class, 'checkout']],
+
+    // Payment (Day 4)
+    ['POST', '/payment/checkout', [PaymentController::class, 'checkout']],
+    ['GET', '/order/success', [PaymentController::class, 'success']],
+    ['GET', '/order/confirmation', [PaymentController::class, 'confirmation']],
+    ['GET', '/order/cancel', [PaymentController::class, 'cancel']],
 
     ['GET', '/contact', [ContactController::class, 'index']],
 
