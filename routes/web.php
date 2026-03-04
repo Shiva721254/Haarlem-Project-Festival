@@ -26,6 +26,7 @@ return [
     ['GET', '/profile', [AuthController::class, 'showProfile']],
     ['GET', '/profile/orders', [UserOrderController::class, 'orders']],
     ['GET', '/profile/orders/view', [UserOrderController::class, 'orderDetail']],  // ?id=1
+    ['GET', '/profile/orders/download/{id}', [UserOrderController::class, 'downloadInvoice']],
 
     // Cart
     ['GET', '/cart', [CartController::class, 'show']],

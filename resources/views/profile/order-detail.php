@@ -126,6 +126,15 @@
             <br>
             <strong>Order Reference:</strong> #<?= h($order['id']) ?>
         </div>
+
+        <div class="footer-actions">
+            <button onclick="window.print()" class="btn btn-print">
+                🖨️ Print Invoice
+            </button>
+            <a href="/profile/orders/download/<?= h($order['id']) ?>" class="btn btn-download">
+                ⬇️ Download PDF
+            </a>
+        </div>
     </div>
 
     <div class="invoice-next-steps">
@@ -396,13 +405,17 @@
         padding: 1.5rem;
         background-color: #f9f9f9;
         border-left: 3px solid #0078d4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
     }
 
     .payment-info {
         font-size: 0.95rem;
         color: #505050;
         line-height: 1.6;
-        margin-bottom: 1rem;
+        flex: 1;
     }
 
     .payment-info code {
@@ -411,6 +424,16 @@
         border-radius: 2px;
         color: #0078d4;
         font-weight: 600;
+    }
+
+    .footer-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .footer-actions .btn {
+        padding: 0.6rem 1.2rem;
     }
 
     .invoice-next-steps {
@@ -448,6 +471,7 @@
     /* Action Buttons */
     .invoice-actions {
         display: flex;
+        justify-content: space-between;
         gap: 1rem;
         margin-top: 2rem;
         padding-top: 1.5rem;
@@ -486,6 +510,28 @@
     .btn-secondary:hover {
         background-color: #e8e8e8;
         color: #323232;
+    }
+
+    .btn-print {
+        background-color: #666666;
+        color: white;
+        border: none;
+    }
+
+    .btn-print:hover {
+        background-color: #555555;
+        color: white;
+    }
+
+    .btn-download {
+        background-color: #107c10;
+        color: white;
+        border: none;
+    }
+
+    .btn-download:hover {
+        background-color: #0d5d0c;
+        color: white;
     }
 
     /* Badges */
@@ -527,6 +573,10 @@
         }
 
         .invoice-actions {
+            display: none;
+        }
+
+        .footer-actions {
             display: none;
         }
 
@@ -584,8 +634,25 @@
             height: 150px;
         }
 
+        .invoice-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .footer-actions {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .footer-actions .btn {
+            width: 100%;
+            text-align: center;
+        }
+
         .invoice-actions {
             flex-direction: column;
+            justify-content: flex-start;
         }
 
         .btn {
@@ -600,10 +667,6 @@
         .items-table th,
         .items-table td {
             padding: 0.5rem;
-        }
-
-        .invoice-footer {
-            margin-top: 1rem;
         }
 
         .invoice-next-steps {

@@ -59,4 +59,55 @@ final class UserOrderController
             'items' => $order['items'] ?? [],
         ]));
     }
+
+    public function downloadInvoice(): Response
+    {
+        // Require authentication
+        if (!Auth::check()) {
+            return Response::redirect('/login');
+        }
+
+        $userId = Auth::user()['id'];
+        
+        // Extract ID from URL path /profile/orders/download/123
+        $pathParts = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+        $orderId = 0;
+        
+        // Find 'download' and get the ID after it
+        foreach ($pathParts as $key => $part) {
+            if ($part === 'download' && isset($pathParts[$key + 1])) {
+                $orderId = (int)$pathParts[$key + 1];
+                break;
+            }
+        }
+
+        if (!$orderId) {
+            return Response::redirect('/profile/orders');
+        }
+
+        $repo = new OrderRepository();
+        $order = $repo->findById($orderId);
+
+        // Verify order belongs to current user
+        if (!$order || $order['user_id'] !== $userId) {
+            return Response::redirect('/profile/orders');
+        }
+
+        // Generate filename
+        $filename = 'Invoice_Order_' . $order['id'] . '_' . date('Ymd') . '.html';
+
+        // Get invoice HTML
+        $invoiceHtml = view('profile/order-detail', [
+            'title' => 'Order #' . $order['id'],
+            'order' => $order,
+            'items' => $order['items'] ?? [],
+        ]);
+
+        // Return with download headers
+        return Response::html($invoiceHtml, 200)
+            ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->withHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->withHeader('Pragma', 'no-cache')
+            ->withHeader('Expires', '0');
+    }
 }
