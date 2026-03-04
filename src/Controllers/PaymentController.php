@@ -7,6 +7,7 @@ use App\Framework\SessionManager;
 use App\Framework\Flash;
 use App\Services\CartService;
 use App\Services\PaymentService;
+use App\Services\EmailService;
 use App\Repositories\OrderRepository;
 
 class PaymentController
@@ -113,6 +114,14 @@ class PaymentController
             // Update order status to 'completed'
             $intent_id = $session['payment_intent'] ?? null;
             $this->order_repo->updateStatus($order_id, 'completed', $intent_id);
+
+            // Send order confirmation email
+            try {
+                EmailService::sendOrderConfirmation($order_id);
+            } catch (\Exception $e) {
+                error_log('Email sending failed: ' . $e->getMessage());
+                // Don't fail the payment just because email failed
+            }
 
             // Clear cart session
             CartService::clear();

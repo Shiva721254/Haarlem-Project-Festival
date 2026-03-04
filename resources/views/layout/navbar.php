@@ -9,9 +9,12 @@
 
         <?php if (\App\Framework\Auth::isLoggedIn()): ?>
             <li><a href="/profile">Profile</a></li>
+            <li><a href="/profile/orders">My Orders</a></li>
             
             <?php if (\App\Framework\Auth::isAdmin()): ?>
-                <li><a href="/admin/events">Admin</a></li>
+                <li><a href="/admin">Admin</a></li>
+                <li><a href="/admin/events">Events</a></li>
+                <li><a href="/admin/orders">Orders</a></li>
             <?php endif; ?>
             
             <li>

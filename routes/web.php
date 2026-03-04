@@ -7,6 +7,7 @@ use App\Controllers\AuthController;
 use App\Controllers\ContactController;
 use App\Controllers\CartController;
 use App\Controllers\PaymentController;
+use App\Controllers\UserOrderController;
 
 return [
     ['GET',  '/',         [HomeController::class, 'index']],
@@ -23,6 +24,8 @@ return [
     
     // Profile
     ['GET', '/profile', [AuthController::class, 'showProfile']],
+    ['GET', '/profile/orders', [UserOrderController::class, 'orders']],
+    ['GET', '/profile/orders/view', [UserOrderController::class, 'orderDetail']],  // ?id=1
 
     // Cart
     ['GET', '/cart', [CartController::class, 'show']],
