@@ -93,7 +93,10 @@ final class AuthController
         ]);
 
         Flash::set('success', 'Welcome back!');
-        return Response::redirect('/admin/events');
+        
+        // Redirect based on user role
+        $redirectPath = $user['role'] === 'admin' ? '/admin/events' : '/schedule';
+        return Response::redirect($redirectPath);
     }
 
     public function logout(): Response
