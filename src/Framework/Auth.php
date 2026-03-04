@@ -15,6 +15,16 @@ final class Auth
     {
         return self::user() !== null;
     }
+    
+    public static function isLoggedIn(): bool
+    {
+        return isset($_SESSION['user']['id']);
+    }
+    
+    public static function userId(): ?int
+    {
+        return isset($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : null;
+    }
 
     public static function isAdmin(): bool
     {
