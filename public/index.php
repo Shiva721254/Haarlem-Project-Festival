@@ -1,14 +1,15 @@
 <?php
 declare(strict_types=1);
 
-session_start();
-
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Framework\Router;
 use App\Framework\Response;
 use App\Framework\Auth;
 use App\Framework\Flash;
+use App\Framework\SessionManager;
+
+SessionManager::start();
 
 $router = new Router();
 

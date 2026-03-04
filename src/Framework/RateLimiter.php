@@ -36,12 +36,17 @@ final class RateLimiter
         }
         
         // Check if lockout has expired
-        if ($attempts['locked_until'] < time()) {
+        if ($attempts['locked_until'] > 0 && $attempts['locked_until'] < time()) {
             unset($_SESSION[$cacheKey]);
             return false;
         }
         
-        return true;
+        // Check if currently locked
+        if ($attempts['locked_until'] > time()) {
+            return true;
+        }
+        
+        return false;
     }
     
     /**

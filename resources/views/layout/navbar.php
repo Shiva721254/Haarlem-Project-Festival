@@ -7,6 +7,8 @@
         <li><a href="/contact">Contact</a></li>
 
         <?php if (\App\Framework\Auth::isLoggedIn()): ?>
+            <li><a href="/profile">Profile</a></li>
+            
             <?php if (\App\Framework\Auth::isAdmin()): ?>
                 <li><a href="/admin/events">Admin</a></li>
             <?php endif; ?>

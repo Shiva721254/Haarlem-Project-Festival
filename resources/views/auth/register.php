@@ -6,6 +6,7 @@ use App\Framework\Csrf;
 /** @var ?string $success */
 /** @var ?string $error */
 /** @var array $errors */
+/** @var array $old */
 ?>
 
 <h1>Create Account</h1>
@@ -39,21 +40,21 @@ use App\Framework\Csrf;
     <label for="first_name">First Name *</label><br>
     <input id="first_name" type="text" name="first_name" required 
            style="width:100%; padding:8px;" 
-           value="<?= htmlspecialchars($_POST['first_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+           value="<?= htmlspecialchars($old['first_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
   </div>
 
   <div style="margin-bottom:12px;">
     <label for="last_name">Last Name *</label><br>
     <input id="last_name" type="text" name="last_name" required 
            style="width:100%; padding:8px;"
-           value="<?= htmlspecialchars($_POST['last_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+           value="<?= htmlspecialchars($old['last_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
   </div>
 
   <div style="margin-bottom:12px;">
     <label for="email">Email *</label><br>
     <input id="email" type="email" name="email" required 
            style="width:100%; padding:8px;"
-           value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+           value="<?= htmlspecialchars($old['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
   </div>
 
   <div style="margin-bottom:12px;">

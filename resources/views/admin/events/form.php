@@ -7,10 +7,6 @@ declare(strict_types=1);
  * @var array<int,string> $errors
  */
 
-function h(string $s): string {
-    return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
-}
-
 // Category list (fully qualified – best practice in views)
 $categories = \App\Config\EventCategories::all();
 
