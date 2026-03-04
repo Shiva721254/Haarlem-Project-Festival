@@ -149,9 +149,9 @@ class PaymentController
         // Log the page view for analytics
         error_log('Order confirmation viewed: Order ID ' . $order_id . ' by ' . $order['customer_email']);
 
-        return Response::view('order/confirmation', [
+        return Response::html(view('order/confirmation', [
             'order' => $order,
-        ]);
+        ]));
     }
 
     /**
