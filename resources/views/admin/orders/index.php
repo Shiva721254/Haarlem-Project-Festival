@@ -340,7 +340,7 @@
 .orders-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .orders-table thead {
@@ -349,13 +349,14 @@
 }
 
 .orders-table th {
-    padding: 12px 16px;
+    padding: 10px 12px;
     text-align: left;
     font-weight: 600;
     color: #666;
-    font-size: 13px;
+    font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
 }
 
 .orders-table tbody tr {
@@ -368,34 +369,58 @@
 }
 
 .orders-table td {
-    padding: 12px 16px;
+    padding: 10px 12px;
     color: #000;
     vertical-align: middle;
 }
 
-/* Column Widths */
-.col-id { width: 80px; }
-.col-customer { width: 140px; }
-.col-email { width: 180px; }
-.col-amount { width: 100px; }
-.col-status { width: 120px; }
-.col-date { width: 140px; }
-.col-actions { width: 150px; }
+/* Column Widths - Compact */
+.col-id { 
+    width: 60px;
+    text-align: center;
+}
+.col-customer { 
+    width: 110px;
+    min-width: 110px;
+}
+.col-email { 
+    width: 150px;
+    min-width: 150px;
+}
+.col-amount { 
+    width: 75px;
+    text-align: right;
+}
+.col-status { 
+    width: 85px;
+}
+.col-date { 
+    width: 100px;
+    text-align: center;
+}
+.col-actions { 
+    width: 100px;
+    text-align: center;
+}
 
 /* Order ID Badge */
 .order-id-badge {
     background: #f0f7ff;
     color: #0078d4;
-    padding: 4px 10px;
-    border-radius: 4px;
+    padding: 3px 8px;
+    border-radius: 3px;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 /* Customer Name */
 .customer-name {
     font-weight: 500;
     color: #000;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Email Link */
@@ -403,6 +428,11 @@
     color: #0078d4;
     text-decoration: none;
     transition: color 0.2s;
+    font-size: 12px;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .email-link:hover {
@@ -414,14 +444,15 @@
 .amount-value {
     font-weight: 600;
     color: #000;
+    font-size: 13px;
 }
 
 /* Status Badges */
 .status-badge {
     display: inline-block;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 13px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
 }
@@ -446,6 +477,7 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+    font-size: 12px;
 }
 
 .date-value {
@@ -454,19 +486,19 @@
 }
 
 .date-time {
-    font-size: 12px;
+    font-size: 11px;
     color: #999;
 }
 
 /* Action Button */
 .action-button {
     display: inline-block;
-    padding: 6px 14px;
+    padding: 5px 10px;
     background: #0078d4;
     color: white;
     text-decoration: none;
-    border-radius: 4px;
-    font-size: 13px;
+    border-radius: 3px;
+    font-size: 12px;
     font-weight: 600;
     transition: all 0.2s;
     white-space: nowrap;
@@ -508,6 +540,138 @@
     color: #000;
 }
 
+/* Print Styles - A4 Format */
+@media print {
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 210mm;
+        height: 297mm;
+        margin: 0;
+        padding: 10mm;
+        background: white;
+    }
+
+    .orders-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        background: white;
+        min-height: auto;
+    }
+
+    .breadcrumb-nav,
+    .page-subtitle,
+    .stat-box:hover,
+    .action-button,
+    .page-footer {
+        display: none;
+    }
+
+    .orders-header {
+        margin-bottom: 15mm;
+    }
+
+    .page-title {
+        font-size: 18pt;
+        margin-bottom: 5mm;
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 3mm;
+        margin-bottom: 15mm;
+        page-break-inside: avoid;
+    }
+
+    .stat-box {
+        padding: 8mm;
+        box-shadow: none;
+        border: 0.5pt solid #ddd;
+        font-size: 10pt;
+    }
+
+    .stat-icon {
+        font-size: 16pt;
+        min-width: 25mm;
+    }
+
+    .stat-value {
+        font-size: 14pt;
+    }
+
+    .stat-label {
+        font-size: 8pt;
+    }
+
+    .orders-table-card {
+        box-shadow: none;
+        border: 0.5pt solid #ddd;
+        margin-bottom: 0;
+    }
+
+    .table-header {
+        padding: 8mm;
+        border-bottom: 1pt solid #ddd;
+    }
+
+    .table-header h2 {
+        font-size: 12pt;
+    }
+
+    .table-info {
+        background: white;
+        border: 0.5pt solid #ddd;
+        font-size: 9pt;
+    }
+
+    .orders-table {
+        font-size: 9pt;
+    }
+
+    .orders-table th {
+        padding: 5mm 4mm;
+        font-size: 8pt;
+        background: #f0f0f0;
+        border-bottom: 1pt solid #ddd;
+    }
+
+    .orders-table td {
+        padding: 4mm;
+        border-bottom: 0.5pt solid #f0f0f0;
+        font-size: 9pt;
+    }
+
+    .orders-table tbody tr:hover {
+        background: white;
+    }
+
+    /* Adjust column widths for print */
+    .col-id { width: 25mm; }
+    .col-customer { width: 30mm; }
+    .col-email { width: 40mm; }
+    .col-amount { width: 20mm; }
+    .col-status { width: 20mm; }
+    .col-date { width: 25mm; }
+    .col-actions { width: 25mm; }
+
+    .customer-name,
+    .email-link {
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .action-button {
+        padding: 2mm 4mm;
+        font-size: 8pt;
+    }
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .stats-container {
@@ -539,18 +703,18 @@
     }
 
     .col-email { display: none; }
-    .col-customer { width: 120px; }
-    .col-id { width: 70px; }
+    .col-customer { width: 100px; }
+    .col-id { width: 60px; }
 
     .orders-table th,
     .orders-table td {
-        padding: 10px 12px;
-        font-size: 12px;
+        padding: 8px 10px;
+        font-size: 11px;
     }
 
     .action-button {
-        padding: 4px 10px;
-        font-size: 12px;
+        padding: 4px 8px;
+        font-size: 11px;
     }
 }
 
@@ -560,20 +724,26 @@
     }
 
     .col-date { display: none; }
-    .col-status { width: 100px; }
-    .col-amount { width: 90px; }
-    .col-actions { width: 80px; }
+    .col-status { width: 80px; }
+    .col-amount { width: 70px; }
+    .col-actions { width: 70px; }
 
     .stat-box {
         padding: 15px;
     }
 
     .stat-icon {
-        font-size: 24px;
+        font-size: 20px;
     }
 
     .stat-value {
-        font-size: 20px;
+        font-size: 18px;
+    }
+
+    .orders-table th,
+    .orders-table td {
+        padding: 6px 8px;
+        font-size: 10px;
     }
 }
 </style>
