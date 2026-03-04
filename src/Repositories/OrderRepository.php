@@ -2,6 +2,8 @@
 
 namespace App\Repositories;
 
+use App\Framework\Repository;
+
 class OrderRepository extends Repository
 {
     /**
@@ -16,36 +18,37 @@ class OrderRepository extends Repository
      */
     public function create(?int $user_id, string $customer_email, ?string $customer_name, float $total_amount, array $items): int
     {
-        $this->db->beginTransaction();
+        $db = $this->pdo();
+        $db->beginTransaction();
 
         try {
             // Insert order header
-            $stmt = $this->db->prepare('
+            $stmt = $db->prepare('
                 INSERT INTO orders (user_id, customer_email, customer_name, total_amount, status)
                 VALUES (?, ?, ?, ?, "pending")
             ');
             $stmt->execute([$user_id, $customer_email, $customer_name, $total_amount]);
-            $order_id = $this->db->lastInsertId();
+            $order_id = $db->lastInsertId();
 
             // Insert order items and update ticket quantity_sold
             foreach ($items as $ticket_id => $quantity) {
-                $stmt = $this->db->prepare('
+                $stmt = $db->prepare('
                     INSERT INTO order_items (order_id, ticket_id, quantity, price_at_purchase)
                     SELECT ?, ?, ?, price FROM tickets WHERE id = ?
                 ');
                 $stmt->execute([$order_id, $ticket_id, $quantity, $ticket_id]);
 
                 // Increment quantity_sold
-                $stmt = $this->db->prepare('
+                $stmt = $db->prepare('
                     UPDATE tickets SET quantity_sold = quantity_sold + ? WHERE id = ?
                 ');
                 $stmt->execute([$quantity, $ticket_id]);
             }
 
-            $this->db->commit();
+            $db->commit();
             return $order_id;
         } catch (\Exception $e) {
-            $this->db->rollBack();
+            $db->rollBack();
             throw $e;
         }
     }
@@ -58,7 +61,7 @@ class OrderRepository extends Repository
      */
     public function findById(int $order_id): ?array
     {
-        $stmt = $this->db->prepare('
+        $rows = $this->all('
             SELECT 
                 o.*,
                 oi.id as item_id,
@@ -74,9 +77,7 @@ class OrderRepository extends Repository
             LEFT JOIN events e ON t.event_id = e.id
             WHERE o.id = ?
             ORDER BY oi.id
-        ');
-        $stmt->execute([$order_id]);
-        $rows = $stmt->fetchAll();
+        ', [$order_id]);
 
         if (empty($rows)) {
             return null;
@@ -121,14 +122,12 @@ class OrderRepository extends Repository
      */
     public function findByUserId(int $user_id): array
     {
-        $stmt = $this->db->prepare('
+        return $this->all('
             SELECT *
             FROM orders
             WHERE user_id = ?
             ORDER BY created_at DESC
-        ');
-        $stmt->execute([$user_id]);
-        return $stmt->fetchAll();
+        ', [$user_id]);
     }
 
     /**
@@ -142,19 +141,17 @@ class OrderRepository extends Repository
     public function updateStatus(int $order_id, string $status, ?string $stripe_intent_id = null): bool
     {
         if ($stripe_intent_id) {
-            $stmt = $this->db->prepare('
+            return (bool)$this->exec('
                 UPDATE orders
                 SET status = ?, stripe_payment_intent_id = ?, updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
-            ');
-            return $stmt->execute([$status, $stripe_intent_id, $order_id]);
+            ', [$status, $stripe_intent_id, $order_id]);
         } else {
-            $stmt = $this->db->prepare('
+            return (bool)$this->exec('
                 UPDATE orders
                 SET status = ?, updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
-            ');
-            return $stmt->execute([$status, $order_id]);
+            ', [$status, $order_id]);
         }
     }
 
@@ -166,10 +163,8 @@ class OrderRepository extends Repository
      */
     public function findByStripeIntentId(string $stripe_intent_id): ?array
     {
-        $stmt = $this->db->prepare('
+        return $this->one('
             SELECT * FROM orders WHERE stripe_payment_intent_id = ? LIMIT 1
-        ');
-        $stmt->execute([$stripe_intent_id]);
-        return $stmt->fetch();
+        ', [$stripe_intent_id]);
     }
 }
