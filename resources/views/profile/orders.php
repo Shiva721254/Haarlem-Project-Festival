@@ -26,15 +26,15 @@
                         <tbody>
                             <?php foreach ($orders as $order): ?>
                                 <tr>
-                                    <td><strong>#<?php h($order['id']); ?></strong></td>
+                                    <td><strong>#<?= h($order['id']) ?></strong></td>
                                     <td>
                         <?php 
                             $date = new DateTime($order['created_at']);
-                            h($date->format('M d, Y'));
+                            echo h($date->format('M d, Y'));
                         ?>
                                     </td>
                                     <td>
-                        <strong>&euro;<?php h(number_format((float)$order['total_amount'], 2)); ?></strong>
+                        <strong>&euro;<?= h(number_format((float)$order['total_amount'], 2)) ?></strong>
                                     </td>
                                     <td>
                         <?php
@@ -48,8 +48,8 @@
                                 $badgeClass = 'bg-danger';
                             }
                         ?>
-                        <span class="badge <?php h($badgeClass); ?>">
-                            <?php h(ucfirst($status)); ?>
+                        <span class="badge <?= h($badgeClass) ?>">
+                            <?= h(ucfirst($status)) ?>
                         </span>
                                     </td>
                                     <td>

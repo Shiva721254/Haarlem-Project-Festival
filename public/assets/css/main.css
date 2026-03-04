@@ -15,6 +15,18 @@ body {
   color: #fff;
   text-decoration: none;
   margin-right: 16px;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.navbar a:hover {
+  border-bottom-color: #4a90e2;
+}
+
+.navbar a.active {
+  border-bottom-color: #4a90e2;
+  font-weight: 600;
 }
 
 .container {
