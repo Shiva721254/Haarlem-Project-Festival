@@ -18,6 +18,9 @@ return [
     // Registration
     ['GET',  '/register', [AuthController::class, 'showRegister']],
     ['POST', '/register', [AuthController::class, 'register']],
+    
+    // Profile
+    ['GET', '/profile', [AuthController::class, 'showProfile']],
 
     ['GET', '/contact', [ContactController::class, 'index']],
 

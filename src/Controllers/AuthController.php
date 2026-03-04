@@ -3,16 +3,20 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Framework\Auth;
 use App\Framework\Csrf;
 use App\Framework\Flash;
+use App\Framework\RateLimiter;
 use App\Framework\Response;
+use App\Framework\SessionManager;
+use App\Framework\Validator;
 use App\Repositories\UserRepository;
 
 final class AuthController
 {
     public function showLogin(): Response
     {
-        $this->ensureSession();
+        SessionManager::start();
 
         return Response::html(view('auth/login', [
             'success' => Flash::get('success'),
@@ -22,7 +26,7 @@ final class AuthController
 
     public function login(): Response
     {
-        $this->ensureSession();
+        SessionManager::start();
 
         if (!Csrf::verifyFromPost()) {
             Flash::set('error', 'Invalid CSRF token. Please try again.');
@@ -36,16 +40,28 @@ final class AuthController
             Flash::set('error', 'Email and password are required.');
             return Response::redirect('/login');
         }
+        
+        // Check rate limiting
+        if (RateLimiter::isLimited($email)) {
+            $remainingTime = RateLimiter::getRemainingLockoutTime($email);
+            $minutes = ceil($remainingTime / 60);
+            Flash::set('error', "Too many failed login attempts. Please try again in {$minutes} minute(s).");
+            return Response::redirect('/login');
+        }
 
         $repo = new UserRepository();
         $user = $repo->findByEmail($email);
 
         if (!$user || !password_verify($pass, (string)$user['password_hash'])) {
+            RateLimiter::recordAttempt($email);
             Flash::set('error', 'Invalid credentials.');
             return Response::redirect('/login');
         }
+        
+        // Login successful - clear rate limit
+        RateLimiter::clearAttempts($email);
 
-        session_regenerate_id(true);
+        SessionManager::regenerate();
 
         $_SESSION['user'] = [
             'id'    => (int)$user['id'],
@@ -59,24 +75,15 @@ final class AuthController
 
     public function logout(): Response
     {
-        $this->ensureSession();
+        SessionManager::start();
 
         if (!Csrf::verifyFromPost()) {
             Flash::set('error', 'Invalid CSRF token.');
             return Response::redirect('/');
         }
 
-        $_SESSION = [];
-
-        if (ini_get('session.use_cookies')) {
-            $params = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000,
-                $params['path'], $params['domain'], $params['secure'], $params['httponly']
-            );
-        }
-
-        session_destroy();
-
+        SessionManager::destroy();
+        
         Flash::set('success', 'Logged out.');
         return Response::redirect('/');
     }
@@ -84,9 +91,28 @@ final class AuthController
     /**
      * Show registration form
      */
+    /**
+     * Show user profile
+     */
+    public function showProfile(): Response
+    {
+        SessionManager::start();
+        
+        if (!Auth::isLoggedIn()) {
+            return Response::redirect('/login');
+        }
+        
+        $user = Auth::user();
+        
+        return Response::html(view('auth/profile', [
+            'user' => $user,
+            'remaining_time' => SessionManager::getRemainingTime(),
+        ]));
+    }
+    
     public function showRegister(): Response
     {
-        $this->ensureSession();
+        SessionManager::start();
         
         return Response::html(view('auth/register', [
             'success' => Flash::get('success'),
@@ -100,7 +126,7 @@ final class AuthController
      */
     public function register(): Response
     {
-        $this->ensureSession();
+        SessionManager::start();
         
         if (!Csrf::verifyFromPost()) {
             Flash::set('error', 'Invalid CSRF token. Please try again.');
@@ -118,9 +144,9 @@ final class AuthController
         $errors = [];
         
         // Email validation
-        if (!\App\Framework\Validator::required($email)) {
+        if (!Validator::required($email)) {
             $errors[] = 'Email is required';
-        } elseif (!\App\Framework\Validator::email($email)) {
+        } elseif (!Validator::email($email)) {
             $errors[] = 'Invalid email format';
         } else {
             $repo = new UserRepository();
@@ -130,10 +156,10 @@ final class AuthController
         }
         
         // Password validation
-        if (!\App\Framework\Validator::required($password)) {
+        if (!Validator::required($password)) {
             $errors[] = 'Password is required';
         } else {
-            $passwordErrors = \App\Framework\Validator::password($password);
+            $passwordErrors = Validator::password($password);
             $errors = array_merge($errors, $passwordErrors);
         }
         
@@ -143,16 +169,16 @@ final class AuthController
         }
         
         // First name validation
-        if (!\App\Framework\Validator::required($firstName)) {
+        if (!Validator::required($firstName)) {
             $errors[] = 'First name is required';
-        } elseif (!\App\Framework\Validator::length($firstName, 2, 100)) {
+        } elseif (!Validator::length($firstName, 2, 100)) {
             $errors[] = 'First name must be between 2 and 100 characters';
         }
         
         // Last name validation
-        if (!\App\Framework\Validator::required($lastName)) {
+        if (!Validator::required($lastName)) {
             $errors[] = 'Last name is required';
-        } elseif (!\App\Framework\Validator::length($lastName, 2, 100)) {
+        } elseif (!Validator::length($lastName, 2, 100)) {
             $errors[] = 'Last name must be between 2 and 100 characters';
         }
         
@@ -169,7 +195,7 @@ final class AuthController
             $userId = $repo->register($email, $password, $firstName, $lastName);
             
             // Auto-login after registration
-            session_regenerate_id(true);
+            SessionManager::regenerate();
             $_SESSION['user'] = [
                 'id'    => $userId,
                 'email' => $email,
@@ -184,10 +210,4 @@ final class AuthController
         }
     }
 
-    private function ensureSession(): void
-    {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
-    }
 }
