@@ -29,3 +29,19 @@ CREATE TABLE IF NOT EXISTS events (
   description TEXT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tickets table (Sprint Day 3)
+CREATE TABLE IF NOT EXISTS tickets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  event_id INT NOT NULL,
+  ticket_type VARCHAR(100) NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  quantity_available INT UNSIGNED NOT NULL DEFAULT 0,
+  quantity_sold INT UNSIGNED NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_tickets_event
+    FOREIGN KEY (event_id) REFERENCES events(id)
+    ON DELETE CASCADE,
+  INDEX idx_tickets_event (event_id),
+  UNIQUE KEY uniq_event_ticket_type (event_id, ticket_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

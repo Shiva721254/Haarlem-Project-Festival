@@ -5,6 +5,7 @@ namespace App\Controllers;
 
 use App\Framework\Response;
 use App\Repositories\EventRepository;
+use App\Repositories\TicketRepository;
 
 final class ScheduleController
 {
@@ -26,10 +27,20 @@ final class ScheduleController
             $grouped[$date][] = $e;
         }
 
+        $eventIds = array_values(array_map(static fn(array $event): int => (int)$event['id'], $events));
+        $ticketRepo = new TicketRepository();
+        $tickets = $ticketRepo->findByEventIds($eventIds);
+        $ticketsByEvent = [];
+        foreach ($tickets as $ticket) {
+            $eventId = (int)$ticket['event_id'];
+            $ticketsByEvent[$eventId][] = $ticket;
+        }
+
         ob_start();
         $groups = $grouped;
         $categories = $allowed;
         $selectedCategory = $selected;
+        $ticketsForEvents = $ticketsByEvent;
         require __DIR__ . '/../../resources/views/schedule/index.php';
         $content = (string)ob_get_clean();
 

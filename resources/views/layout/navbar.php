@@ -4,6 +4,7 @@
     <ul class="nav-links">
         <li><a href="/">Home</a></li>
         <li><a href="/schedule">Schedule</a></li>
+        <li><a href="/cart">Cart (<?= \App\Services\CartService::count() ?>)</a></li>
         <li><a href="/contact">Contact</a></li>
 
         <?php if (\App\Framework\Auth::isLoggedIn()): ?>
