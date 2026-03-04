@@ -32,4 +32,39 @@ final class UserRepository extends Repository
             ]
         );
     }
+    
+    /**
+     * Create new visitor account
+     */
+    public function register(string $email, string $password, string $firstName = '', string $lastName = ''): int
+    {
+        $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+        
+        $this->exec(
+            'INSERT INTO users (email, password_hash, role, first_name, last_name)
+             VALUES (:email, :hash, :role, :first_name, :last_name)',
+            [
+                'email' => $email,
+                'hash'  => $hash,
+                'role'  => 'visitor',
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+            ]
+        );
+        
+        return (int)$this->pdo()->lastInsertId();
+    }
+    
+    /**
+     * Check if email exists
+     */
+    public function emailExists(string $email): bool
+    {
+        $result = $this->one(
+            'SELECT id FROM users WHERE email = :email LIMIT 1',
+            ['email' => $email]
+        );
+        
+        return $result !== null;
+    }
 }

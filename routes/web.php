@@ -14,6 +14,10 @@ return [
     ['GET',  '/login',    [AuthController::class, 'showLogin']],
     ['POST', '/login',    [AuthController::class, 'login']],
     ['POST', '/logout',   [AuthController::class, 'logout']],
+    
+    // Registration
+    ['GET',  '/register', [AuthController::class, 'showRegister']],
+    ['POST', '/register', [AuthController::class, 'register']],
 
     ['GET', '/contact', [ContactController::class, 'index']],
 
