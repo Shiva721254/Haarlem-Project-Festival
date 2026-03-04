@@ -376,23 +376,23 @@
 
 /* Column Widths - Compact */
 .col-id { 
-    width: 60px;
+    width: 30px;
     text-align: center;
 }
 .col-customer { 
-    width: 110px;
-    min-width: 110px;
+    width: 55px;
+    min-width: 55px;
 }
 .col-email { 
     width: 150px;
     min-width: 150px;
 }
 .col-amount { 
-    width: 75px;
+    width: 38px;
     text-align: right;
 }
 .col-status { 
-    width: 85px;
+    width: 43px;
 }
 .col-date { 
     width: 100px;
@@ -652,11 +652,11 @@
     }
 
     /* Adjust column widths for print */
-    .col-id { width: 25mm; }
-    .col-customer { width: 30mm; }
+    .col-id { width: 12mm; }
+    .col-customer { width: 15mm; }
     .col-email { width: 40mm; }
-    .col-amount { width: 20mm; }
-    .col-status { width: 20mm; }
+    .col-amount { width: 10mm; }
+    .col-status { width: 11mm; }
     .col-date { width: 25mm; }
     .col-actions { width: 25mm; }
 
