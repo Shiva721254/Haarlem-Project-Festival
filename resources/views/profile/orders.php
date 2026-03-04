@@ -1,7 +1,3 @@
-<?php
-$this->layout('layout/app', ['title' => 'My Orders'])
-?>
-
 <div class="container mt-5">
     <div class="row">
         <div class="col-12">

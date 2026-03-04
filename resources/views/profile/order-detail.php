@@ -86,10 +86,6 @@ $this->layout('layout/app', ['title' => 'My Orders'])
         background-color: #f5f5f5;
     }
 </style>
-<?php
-$this->layout('layout/app', ['title' => 'Order #' . $order['id']])
-?>
-
 <div class="container mt-5 mb-5">
     <div class="row">
         <div class="col-12">

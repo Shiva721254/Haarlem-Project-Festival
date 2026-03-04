@@ -23,6 +23,7 @@ final class UserOrderController
         $orders = $repo->findByUserId($userId);
 
         return Response::html(view('profile/orders', [
+            'title' => 'My Orders',
             'orders' => $orders,
             'userName' => Auth::user()['first_name'] ?? Auth::user()['email'],
         ]));
@@ -53,6 +54,7 @@ final class UserOrderController
         }
 
         return Response::html(view('profile/order-detail', [
+            'title' => 'Order #' . $order['id'],
             'order' => $order,
             'items' => $order['items'] ?? [],
         ]));

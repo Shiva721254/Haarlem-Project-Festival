@@ -23,6 +23,7 @@ final class AdminOrderController
         ', []);
 
         return Response::html(view('admin/orders/index', [
+            'title' => 'Order Management',
             'orders' => $orders,
             'orderCount' => count($orders),
             'totalRevenue' => array_sum(array_column($orders, 'total_amount')),
@@ -49,6 +50,7 @@ final class AdminOrderController
         }
 
         return Response::html(view('admin/orders/detail', [
+            'title' => 'Order #' . $order['id'],
             'order' => $order,
             'items' => $order['items'] ?? [],
         ]));
