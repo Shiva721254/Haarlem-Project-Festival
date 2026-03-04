@@ -5,16 +5,16 @@ namespace App\Framework;
 
 final class Flash
 {
-    public static function set(string $key, string $message): void
+    public static function set(string $key, string|array $message): void
     {
         $_SESSION['flash'][$key] = $message;
     }
 
-    public static function get(string $key): ?string
+    public static function get(string $key): string|array|null
     {
         $msg = $_SESSION['flash'][$key] ?? null;
         unset($_SESSION['flash'][$key]);
 
-        return is_string($msg) ? $msg : null;
+        return $msg;
     }
 }
