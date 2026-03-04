@@ -16,6 +16,15 @@ final class SessionManager
     public static function start(): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
+            // Ensure session save path is writable
+            $sessionPath = __DIR__ . '/../../storage/sessions';
+            if (!is_dir($sessionPath)) {
+                @mkdir($sessionPath, 0755, true);
+            }
+            if (is_dir($sessionPath) && is_writable($sessionPath)) {
+                ini_set('session.save_path', $sessionPath);
+            }
+
             // Configure session security
             ini_set('session.use_strict_mode', '1');
             ini_set('session.use_only_cookies', '1');
@@ -47,6 +56,9 @@ final class SessionManager
         // Check if session expired
         if (($now - $lastActivity) > self::SESSION_TIMEOUT) {
             self::destroy();
+            SecurityLogger::warning('session.timeout', [
+                'ip' => (string)($_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown'),
+            ]);
             Flash::set('error', 'Session expired. Please login again.');
         } else {
             // Update last activity
@@ -84,6 +96,12 @@ final class SessionManager
         }
         
         session_destroy();
+
+        // Start fresh session so flash messages can still be set after destroy.
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+        $_SESSION['last_activity'] = time();
     }
     
     /**

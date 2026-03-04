@@ -6,10 +6,6 @@ declare(strict_types=1);
  * @var array<int, string> $categories
  * @var string $selectedCategory
  */
-
-function h(string $s): string {
-    return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
-}
 ?>
 
 <h1>Festival Schedule</h1>

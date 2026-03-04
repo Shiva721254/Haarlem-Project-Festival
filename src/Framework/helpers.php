@@ -27,5 +27,20 @@ function view(string $name, array $data = []): string
 
     ob_start();
     require $path;
-    return (string)ob_get_clean();
+    $content = (string)ob_get_clean();
+    
+    // Don't wrap layout files themselves
+    $isLayoutFile = str_starts_with($name, 'layout/');
+    
+    if (!$isLayoutFile) {
+        // Wrap in layout
+        $layoutPath = $base . 'layout/app.php';
+        extract(['title' => $data['title'] ?? 'Haarlem Festival', 'content' => $content], EXTR_SKIP);
+        
+        ob_start();
+        require $layoutPath;
+        return (string)ob_get_clean();
+    }
+    
+    return $content;
 }

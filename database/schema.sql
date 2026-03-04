@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Add default admin user (password: Admin123!)
 INSERT INTO users (email, password_hash, role) VALUES
-('admin@haarlemfestival.nl', '$2y$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQ/ZKwQhWo.bCEEVa0b0YXaAm', 'admin')
-ON DUPLICATE KEY UPDATE email=email;
+('admin@haarlemfestival.nl', '$2y$12$48/mAMTpsHZ0vcFitlPY9O3Gk.nnYHt9ZNA/ULGtzKYMdrUZQMJUW', 'admin')
+ON DUPLICATE KEY UPDATE password_hash='$2y$12$48/mAMTpsHZ0vcFitlPY9O3Gk.nnYHt9ZNA/ULGtzKYMdrUZQMJUW';
 
 -- Events table
 CREATE TABLE IF NOT EXISTS events (
