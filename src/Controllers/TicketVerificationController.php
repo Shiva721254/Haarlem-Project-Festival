@@ -24,6 +24,10 @@ final class TicketVerificationController
      */
     public function verify(): Response
     {
+        if (($authError = $this->requireAdminJson()) !== null) {
+            return $authError;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return Response::json(['error' => 'POST required'], 405);
         }
@@ -77,9 +81,9 @@ final class TicketVerificationController
                 ], 400);
             }
 
-            // Check event date
+            // Consider tickets valid for the full event day.
             foreach ($items as $item) {
-                $eventDate = new \DateTime($item['event_date']);
+                $eventDate = new \DateTime(($item['event_date'] ?? date('Y-m-d')) . ' 23:59:59');
                 $now = new \DateTime();
                 
                 if ($eventDate < $now) {
@@ -132,8 +136,8 @@ final class TicketVerificationController
         }
 
         // Require admin auth
-        if (!Auth::check() || !Auth::isAdmin()) {
-            return Response::json(['error' => 'Unauthorized'], 403);
+        if (($authError = $this->requireAdminJson()) !== null) {
+            return $authError;
         }
 
         $data = json_decode(file_get_contents('php://input'), true);
@@ -206,6 +210,10 @@ final class TicketVerificationController
      */
     public function getStatus(): Response
     {
+        if (($authError = $this->requireAdminJson()) !== null) {
+            return $authError;
+        }
+
         $orderId = (int)($_GET['order_id'] ?? 0);
 
         if (!$orderId) {
@@ -235,5 +243,72 @@ final class TicketVerificationController
         } catch (\Exception $e) {
             return Response::json(['error' => 'Failed to get status'], 500);
         }
+    }
+
+    public function getDashboardStats(): Response
+    {
+        if (($authError = $this->requireAdminJson()) !== null) {
+            return $authError;
+        }
+
+        try {
+            $totals = $this->pdo->query('
+                SELECT
+                    COUNT(*) AS total_tickets,
+                    SUM(CASE WHEN is_used = TRUE THEN 1 ELSE 0 END) AS checked_in_tickets
+                FROM order_items
+            ')->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $lastScan = $this->pdo->query('
+                SELECT verified_at
+                FROM ticket_scans
+                ORDER BY verified_at DESC
+                LIMIT 1
+            ')->fetch(PDO::FETCH_ASSOC);
+
+            $activeOrders = $this->pdo->query('
+                SELECT
+                    o.id AS order_id,
+                    o.customer_name,
+                    o.customer_email,
+                    COUNT(*) AS total_tickets,
+                    SUM(CASE WHEN oi.is_used = TRUE THEN 1 ELSE 0 END) AS used_tickets
+                FROM orders o
+                INNER JOIN order_items oi ON oi.order_id = o.id
+                WHERE o.status = "completed"
+                GROUP BY o.id, o.customer_name, o.customer_email
+                HAVING COUNT(*) > SUM(CASE WHEN oi.is_used = TRUE THEN 1 ELSE 0 END)
+                ORDER BY o.created_at DESC
+                LIMIT 8
+            ')->fetchAll(PDO::FETCH_ASSOC);
+
+            $totalTickets = (int)($totals['total_tickets'] ?? 0);
+            $checkedIn = (int)($totals['checked_in_tickets'] ?? 0);
+            $remaining = max(0, $totalTickets - $checkedIn);
+            $percentage = $totalTickets > 0
+                ? (int)round(($checkedIn / $totalTickets) * 100)
+                : 0;
+
+            return Response::json([
+                'total_tickets' => $totalTickets,
+                'checked_in_tickets' => $checkedIn,
+                'remaining_tickets' => $remaining,
+                'percentage' => $percentage,
+                'last_scan' => $lastScan['verified_at'] ?? null,
+                'avg_checkin_time' => null,
+                'active_orders' => $activeOrders,
+            ]);
+        } catch (\Throwable $e) {
+            return Response::json(['error' => 'Failed to load dashboard stats'], 500);
+        }
+    }
+
+    private function requireAdminJson(): ?Response
+    {
+        if (!Auth::check() || !Auth::isAdmin()) {
+            return Response::json(['error' => 'Unauthorized'], 403);
+        }
+
+        return null;
     }
 }

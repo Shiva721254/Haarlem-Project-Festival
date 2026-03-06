@@ -68,6 +68,9 @@ class OrderRepository extends Repository
                 oi.ticket_id,
                 oi.quantity,
                 oi.price_at_purchase,
+                oi.is_used,
+                oi.used_at,
+                oi.checked_by_user_id,
                 t.ticket_type,
                 e.title as event_title,
                 e.event_date
@@ -104,6 +107,9 @@ class OrderRepository extends Repository
                     'ticket_id' => $row['ticket_id'],
                     'quantity' => $row['quantity'],
                     'price_at_purchase' => $row['price_at_purchase'],
+                    'is_used' => (bool)$row['is_used'],
+                    'used_at' => $row['used_at'],
+                    'checked_by_user_id' => $row['checked_by_user_id'],
                     'ticket_type' => $row['ticket_type'],
                     'event_title' => $row['event_title'],
                     'event_date' => $row['event_date']
@@ -137,10 +143,21 @@ class OrderRepository extends Repository
     public function findByUserId(int $user_id): array
     {
         return $this->all('
-            SELECT *
-            FROM orders
-            WHERE user_id = ?
-            ORDER BY created_at DESC
+            SELECT
+                o.*,
+                COALESCE(ti.total_tickets, 0) AS total_tickets,
+                COALESCE(ti.used_tickets, 0) AS used_tickets
+            FROM orders o
+            LEFT JOIN (
+                SELECT
+                    order_id,
+                    COUNT(*) AS total_tickets,
+                    SUM(CASE WHEN is_used = TRUE THEN 1 ELSE 0 END) AS used_tickets
+                FROM order_items
+                GROUP BY order_id
+            ) ti ON ti.order_id = o.id
+            WHERE o.user_id = ?
+            ORDER BY o.created_at DESC
         ', [$user_id]);
     }
 

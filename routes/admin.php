@@ -5,6 +5,7 @@ use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\EventAdminController;
 use App\Controllers\Admin\AdminOrderController;
 use App\Controllers\Admin\CheckinController;
+use App\Controllers\TicketVerificationController;
 
 return [
     ['GET',  '/admin',                 [DashboardController::class, 'index']],
@@ -24,5 +25,8 @@ return [
 
     // Ticket Check-in (Day 6 Feature 2)
     ['GET',  '/admin/checkin',         [CheckinController::class, 'index']],
+    ['POST', '/admin/checkin/verify',  [TicketVerificationController::class, 'verify']],
+    ['POST', '/admin/checkin/scan',    [TicketVerificationController::class, 'markUsed']],
+    ['GET',  '/admin/checkin/stats',   [TicketVerificationController::class, 'getDashboardStats']],
 ];
 

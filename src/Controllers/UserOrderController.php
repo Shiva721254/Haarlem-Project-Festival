@@ -69,15 +69,16 @@ final class UserOrderController
 
         $userId = Auth::user()['id'];
         
-        // Extract ID from URL path /profile/orders/download/123
-        $pathParts = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
-        $orderId = 0;
-        
-        // Find 'download' and get the ID after it
-        foreach ($pathParts as $key => $part) {
-            if ($part === 'download' && isset($pathParts[$key + 1])) {
-                $orderId = (int)$pathParts[$key + 1];
-                break;
+        $orderId = (int)($_GET['id'] ?? 0);
+
+        // Backward-compatible fallback for /profile/orders/download/{id}
+        if ($orderId === 0) {
+            $pathParts = explode('/', trim((string)($_SERVER['REQUEST_URI'] ?? ''), '/'));
+            foreach ($pathParts as $key => $part) {
+                if ($part === 'download' && isset($pathParts[$key + 1])) {
+                    $orderId = (int)$pathParts[$key + 1];
+                    break;
+                }
             }
         }
 

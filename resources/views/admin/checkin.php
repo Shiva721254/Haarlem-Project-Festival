@@ -614,7 +614,7 @@ async function verifyTicket(qrCode) {
     loadingState.classList.remove('hidden');
 
     try {
-        const response = await fetch('/ticket/verify', {
+        const response = await fetch('/admin/checkin/verify', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -697,7 +697,7 @@ async function markTicketAsUsed() {
     verificationResult.classList.add('hidden');
 
     try {
-        const response = await fetch('/ticket/mark-used', {
+        const response = await fetch('/admin/checkin/scan', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -771,14 +771,51 @@ function addToHistory(data) {
 }
 
 async function updateStatistics() {
-    // Update stat cards
-    document.getElementById('totalTickets').textContent = '0';
-    document.getElementById('checkedInTickets').textContent = '0';
-    document.getElementById('remainingTickets').textContent = '0';
-    document.getElementById('checkinProgress').style.width = '0%';
-    document.getElementById('progressText').textContent = '0% checked in';
+    try {
+        const response = await fetch('/admin/checkin/stats');
+        const stats = await response.json();
+
+        if (!response.ok || stats.error) {
+            throw new Error(stats.error || 'Failed to load stats');
+        }
+
+        document.getElementById('totalTickets').textContent = String(stats.total_tickets ?? 0);
+        document.getElementById('checkedInTickets').textContent = String(stats.checked_in_tickets ?? 0);
+        document.getElementById('remainingTickets').textContent = String(stats.remaining_tickets ?? 0);
+
+        const percentage = Number(stats.percentage ?? 0);
+        document.getElementById('checkinProgress').style.width = `${percentage}%`;
+        document.getElementById('progressText').textContent = `${percentage}% checked in`;
+
+        document.getElementById('avgTime').textContent = stats.avg_checkin_time ?? 'N/A';
+        document.getElementById('lastScan').textContent = stats.last_scan
+            ? new Date(stats.last_scan).toLocaleTimeString()
+            : 'N/A';
+
+        const activeOrders = document.getElementById('activeOrders');
+        const orders = Array.isArray(stats.active_orders) ? stats.active_orders : [];
+
+        if (orders.length === 0) {
+            activeOrders.innerHTML = '<div class="empty-state"><p>No orders being processed</p></div>';
+            return;
+        }
+
+        activeOrders.innerHTML = orders.map((order) => {
+            const customer = order.customer_name || order.customer_email || 'Guest';
+            return `
+                <div class="active-order-item">
+                    <div class="order-header">Order #${order.order_id} - ${customer}</div>
+                    <div class="order-details">${order.used_tickets}/${order.total_tickets} checked in</div>
+                </div>
+            `;
+        }).join('');
+    } catch (_error) {
+        document.getElementById('avgTime').textContent = 'N/A';
+        document.getElementById('lastScan').textContent = 'N/A';
+    }
 }
 
 // Initialize
 updateStatistics();
+setInterval(updateStatistics, 15000);
 </script>

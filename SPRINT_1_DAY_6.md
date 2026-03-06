@@ -6,35 +6,35 @@ Implement invoice generation, ticket verification system, and QR code scanning f
 ## Features to Implement
 
 ### 1. Invoice Generation ✅ (IN PROGRESS)
-- [ ] Add download invoice button to order detail page
-- [ ] Create PDF/printable invoice export
-- [ ] Add print-friendly styling
-- [ ] Download invoice as PDF option
+- [x] Add download invoice button to order detail page
+- [x] Create printable invoice export (HTML + print)
+- [x] Add print-friendly styling
+- [ ] Download invoice as true PDF option
 
 ### 2. Ticket Verification System
-- [ ] Create TicketVerificationController
-- [ ] QR code scanner interface
-- [ ] Verify ticket validity
-- [ ] Check ticket expiration
-- [ ] Mark tickets as used/scanned
+- [x] Create TicketVerificationController
+- [x] QR code scanner interface
+- [x] Verify ticket validity
+- [x] Check ticket expiration
+- [x] Mark tickets as used/scanned
 
 ### 3. Ticket Status Tracking
 - [ ] Add ticket_status column (unused/used/verified)
-- [ ] Create TicketRepository with status methods
-- [ ] Admin interface to check-in tickets
-- [ ] Display ticket status on order page
+- [x] Create TicketRepository with status methods
+- [x] Admin interface to check-in tickets
+- [x] Display ticket status on order page
 
 ### 4. Admin Check-in Dashboard
-- [ ] Create check-in interface
-- [ ] Live QR scanning
-- [ ] Real-time ticket validation
-- [ ] Statistics: Total/Checked-in/Remaining
+- [x] Create check-in interface
+- [x] Live QR scanning
+- [x] Real-time ticket validation
+- [x] Statistics: Total/Checked-in/Remaining
 
 ### 5. Security & Validation
-- [ ] Prevent duplicate ticket scans
-- [ ] Validate order ownership
-- [ ] Admin-only access to check-in
-- [ ] Audit log for scans
+- [x] Prevent duplicate ticket scans
+- [x] Validate order ownership
+- [x] Admin-only access to check-in
+- [x] Audit log for scans
 
 ## Technical Details
 
@@ -63,14 +63,12 @@ ALTER TABLE order_items ADD COLUMN checked_by_user_id INT NULL;
 ## Progress
 
 ### Completed
-- [ ] None yet
+- [x] Core Day 6 ticket verification, check-in, and status tracking
 
 ### In Progress
 - [x] Feature branch created: `feature/ticket-verification-qr`
+- [x] Schema and dashboard alignment
 
 ### Todo
-- [ ] Invoice download/print
-- [ ] Database migrations
-- [ ] Controllers implementation
-- [ ] Views implementation
-- [ ] Testing
+- [ ] True PDF generation (library integration)
+- [ ] End-to-end testing and validation checklist

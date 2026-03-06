@@ -62,6 +62,7 @@
                     <th class="text-left">Event</th>
                     <th class="text-center">Type</th>
                     <th class="text-center">Date</th>
+                    <th class="text-center">Entry</th>
                     <th class="text-center">Qty</th>
                     <th class="text-right">Unit Price</th>
                     <th class="text-right">Amount</th>
@@ -81,6 +82,13 @@
                                 $eventDate = new DateTime($item['event_date']);
                                 echo h($eventDate->format('M d'));
                             ?>
+                        </td>
+                        <td class="text-center">
+                            <?php if (!empty($item['is_used'])): ?>
+                                <span class="badge badge-success">Checked In</span>
+                            <?php else: ?>
+                                <span class="badge badge-warning">Pending</span>
+                            <?php endif; ?>
                         </td>
                         <td class="text-center"><?= h($item['quantity']) ?></td>
                         <td class="text-right">&euro;<?= h(number_format($unitPrice, 2)) ?></td>
@@ -131,8 +139,8 @@
             <button onclick="window.print()" class="btn btn-print">
                 🖨️ Print Invoice
             </button>
-            <a href="/profile/orders/download/<?= h($order['id']) ?>" class="btn btn-download">
-                ⬇️ Download PDF
+            <a href="/profile/orders/download?id=<?= h($order['id']) ?>" class="btn btn-download">
+                ⬇️ Download Invoice
             </a>
         </div>
     </div>

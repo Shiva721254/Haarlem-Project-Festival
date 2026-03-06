@@ -18,6 +18,7 @@
                             <tr>
                                 <th>Order ID</th>
                                 <th>Date</th>
+                                <th>Tickets</th>
                                 <th>Total</th>
                                 <th>Status</th>
                                 <th>Action</th>
@@ -32,6 +33,9 @@
                             $date = new DateTime($order['created_at']);
                             echo h($date->format('M d, Y'));
                         ?>
+                                    </td>
+                                    <td>
+                        <?= h((string)($order['used_tickets'] ?? 0)) ?> / <?= h((string)($order['total_tickets'] ?? 0)) ?> used
                                     </td>
                                     <td>
                         <strong>&euro;<?= h(number_format((float)$order['total_amount'], 2)) ?></strong>

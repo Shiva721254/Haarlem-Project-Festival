@@ -27,7 +27,7 @@ return [
     ['GET', '/profile', [AuthController::class, 'showProfile']],
     ['GET', '/profile/orders', [UserOrderController::class, 'orders']],
     ['GET', '/profile/orders/view', [UserOrderController::class, 'orderDetail']],  // ?id=1
-    ['GET', '/profile/orders/download/{id}', [UserOrderController::class, 'downloadInvoice']],
+    ['GET', '/profile/orders/download', [UserOrderController::class, 'downloadInvoice']],
 
     // Ticket Verification (Day 6)
     ['POST', '/ticket/verify', [TicketVerificationController::class, 'verify']],

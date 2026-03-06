@@ -72,6 +72,9 @@ CREATE TABLE IF NOT EXISTS order_items (
   ticket_id INT NOT NULL,
   quantity INT UNSIGNED NOT NULL DEFAULT 1,
   price_at_purchase DECIMAL(10,2) NOT NULL,
+  is_used BOOLEAN NOT NULL DEFAULT FALSE,
+  used_at TIMESTAMP NULL,
+  checked_by_user_id INT UNSIGNED NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_order_items_order
     FOREIGN KEY (order_id) REFERENCES orders(id)
@@ -79,6 +82,29 @@ CREATE TABLE IF NOT EXISTS order_items (
   CONSTRAINT fk_order_items_ticket
     FOREIGN KEY (ticket_id) REFERENCES tickets(id)
     ON DELETE RESTRICT,
+  CONSTRAINT fk_order_items_checked_by
+    FOREIGN KEY (checked_by_user_id) REFERENCES users(id)
+    ON DELETE SET NULL,
   INDEX idx_order_items_order (order_id),
-  INDEX idx_order_items_ticket (ticket_id)
+  INDEX idx_order_items_ticket (ticket_id),
+  INDEX idx_order_items_is_used (is_used),
+  INDEX idx_order_items_used_at (used_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Ticket scan audit log (Sprint Day 6)
+CREATE TABLE IF NOT EXISTS ticket_scans (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  order_item_id INT UNSIGNED NOT NULL,
+  user_id INT UNSIGNED NULL,
+  verified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  ip_address VARCHAR(50) NULL,
+  user_agent TEXT NULL,
+  CONSTRAINT fk_ticket_scans_order_item
+    FOREIGN KEY (order_item_id) REFERENCES order_items(id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_ticket_scans_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE SET NULL,
+  INDEX idx_ticket_scans_verified_at (verified_at),
+  INDEX idx_ticket_scans_order_item_id (order_item_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
