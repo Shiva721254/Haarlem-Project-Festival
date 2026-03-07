@@ -60,8 +60,43 @@ database/
 storage/
 ├─ logs/
 ├─ cache/
+```
 
+---
 
+## Email Confirmation & PDF Invoice
 
+The checkout flow sends a confirmation email with a branded PDF invoice attachment.
 
+### What is implemented
+- Gmail SMTP sending via PHPMailer
+- PDF invoice generation via Dompdf
+- Branded invoice with Haarlem Festival logo
+- Order QR code embedded in the invoice
+- Totals section aligned for print-friendly layout
+
+### Required environment variables
+```dotenv
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=465
+MAIL_USERNAME=your_gmail@gmail.com
+MAIL_PASSWORD=your_16_char_app_password
+MAIL_ENCRYPTION=ssl
+MAIL_FROM_ADDRESS=your_gmail@gmail.com
+MAIL_FROM_NAME=Haarlem Festival
+```
+
+### Local test command
+```powershell
+docker compose exec php php -r "require '/app/bootstrap/app.php'; var_export(\App\Services\EmailService::sendOrderConfirmation(8));"
+```
+
+---
+
+## Status
+
+- Stripe checkout flow: implemented
+- Email confirmation + PDF invoice: implemented
+- QR-based invoice enhancement: implemented
 

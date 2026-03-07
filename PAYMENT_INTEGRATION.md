@@ -601,13 +601,38 @@ Expired:
 
 ---
 
+## Email & Invoice Delivery (Implemented)
+
+### Environment configuration
+```dotenv
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=465
+MAIL_USERNAME=your_gmail@gmail.com
+MAIL_PASSWORD=your_16_char_google_app_password
+MAIL_ENCRYPTION=ssl
+MAIL_FROM_ADDRESS=your_gmail@gmail.com
+MAIL_FROM_NAME=Haarlem Festival
+```
+
+### Invoice capabilities
+- Branded PDF invoice (logo at top)
+- QR code generated from order identifier data
+- Print-oriented totals block (subtotal/tax/total)
+- Attached automatically to order confirmation email
+
+### Validation command
+```powershell
+docker compose exec php php -r "require '/app/bootstrap/app.php'; var_export(\App\Services\EmailService::sendOrderConfirmation(8));"
+```
+
 ## Next Steps After Payment Works
 
 1. ✅ Generate invoices
 2. ✅ Send confirmation emails
-3. ✅ Implement refunds
-4. ✅ Add subscription support (stretch goal)
-5. ✅ Multiple payment methods (Apple Pay, Google Pay)
+3. ⏳ Implement refunds
+4. ⏳ Add subscription support (stretch goal)
+5. ⏳ Multiple payment methods (Apple Pay, Google Pay)
 
 ---
 
