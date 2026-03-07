@@ -1,5 +1,7 @@
 <nav class="navbar">
-    <a href="/" class="logo">Haarlem Festival</a>
+    <a href="/" class="logo">
+        <img src="/assets/images/logo_haarlem_festival.png" alt="Haarlem Festival" class="logo-img">
+    </a>
 
     <ul class="nav-links">
         <?php
@@ -23,9 +25,9 @@
             <?php endif; ?>
             
             <li>
-                <form method="POST" action="/logout" style="display:inline;">
+                <form method="POST" action="/logout" class="logout-form">
                     <?= \App\Framework\Csrf::field() ?>
-                    <button type="submit" style="background:none; border:none; color:inherit; cursor:pointer; font:inherit;">
+                    <button type="submit" class="logout-button">
                         Logout
                     </button>
                 </form>

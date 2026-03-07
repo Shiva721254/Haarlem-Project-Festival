@@ -6,6 +6,9 @@ body {
 .navbar {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
   padding: 16px 24px;
   background: #111;
   color: #fff;
@@ -14,10 +17,58 @@ body {
 .navbar a {
   color: #fff;
   text-decoration: none;
-  margin-right: 16px;
   padding-bottom: 4px;
   border-bottom: 2px solid transparent;
   transition: border-color 0.3s;
+}
+
+.navbar .logo {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.navbar .logo-img {
+  height: 50px;
+  width: auto;
+  display: block;
+}
+
+.navbar .nav-links {
+  list-style: none !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar .nav-links li {
+  list-style: none !important;
+  display: inline-flex;
+  margin: 0;
+}
+
+.logout-form {
+  display: inline;
+  margin: 0;
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0 0 4px;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.logout-button:hover {
+  border-bottom-color: #4a90e2;
 }
 
 .navbar a:hover {
@@ -57,3 +108,46 @@ body {
 
 .flash-success { background: #e9f9ee; border: 1px solid #9be3b0; }
 .flash-error   { background: #fdecec; border: 1px solid #f1a3a3; }
+
+.qty-input {
+  width: 60px;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.qty-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.qty-arrows {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.qty-arrow {
+  width: 18px;
+  height: 12px;
+  border: 1px solid #bbb;
+  background: #fff;
+  line-height: 1;
+  font-size: 10px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.qty-arrow-up {
+  color: #198754;
+}
+
+.qty-arrow-down {
+  color: #dc3545;
+}

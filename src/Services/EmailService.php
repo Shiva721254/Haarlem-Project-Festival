@@ -4,8 +4,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Repositories\OrderRepository;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
+use PHPMailer\PHPMailer\PHPMailer;
 
 final class EmailService
 {
@@ -143,7 +147,102 @@ HTML;
      */
     private static function send(string $to, string $subject, string $html, array $attachments = []): bool
     {
-        $headers = "From: noreply@haarlemfestival.nl\r\n";
+        try {
+            if (self::shouldUseSmtp()) {
+                $result = self::sendViaSmtp($to, $subject, $html, $attachments);
+            } else {
+                $result = self::sendViaMail($to, $subject, $html, $attachments);
+            }
+
+            if ($result) {
+                error_log("Email sent to {$to}: {$subject}");
+            } else {
+                error_log("Failed to send email to {$to}: {$subject}");
+            }
+
+            return $result;
+        } catch (\Throwable $e) {
+            error_log('Email error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private static function shouldUseSmtp(): bool
+    {
+        $mailer = strtolower(trim((string)($_ENV['MAIL_MAILER'] ?? 'smtp')));
+        if ($mailer !== 'smtp') {
+            return false;
+        }
+
+        return trim((string)($_ENV['MAIL_HOST'] ?? '')) !== ''
+            && trim((string)($_ENV['MAIL_USERNAME'] ?? '')) !== ''
+            && trim((string)($_ENV['MAIL_PASSWORD'] ?? '')) !== '';
+    }
+
+    /**
+     * @param array<int, array{filename:string,content:string,mime:string}> $attachments
+     */
+    private static function sendViaSmtp(string $to, string $subject, string $html, array $attachments): bool
+    {
+        if (!class_exists(PHPMailer::class)) {
+            error_log('SMTP mailer unavailable: PHPMailer not installed');
+            return false;
+        }
+
+        $mail = new PHPMailer(true);
+
+        try {
+            $mail->isSMTP();
+            $mail->Host = (string)($_ENV['MAIL_HOST'] ?? 'smtp.gmail.com');
+            $mail->Port = (int)($_ENV['MAIL_PORT'] ?? 587);
+            $mail->SMTPAuth = true;
+            $mail->Username = (string)($_ENV['MAIL_USERNAME'] ?? '');
+            $mail->Password = (string)($_ENV['MAIL_PASSWORD'] ?? '');
+
+            $encryption = strtolower(trim((string)($_ENV['MAIL_ENCRYPTION'] ?? 'tls')));
+            if ($encryption === 'ssl') {
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            } elseif ($encryption === 'tls' || $encryption === 'starttls') {
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            } else {
+                $mail->SMTPSecure = '';
+                $mail->SMTPAutoTLS = false;
+            }
+
+            $fromAddress = trim((string)($_ENV['MAIL_FROM_ADDRESS'] ?? $_ENV['MAIL_USERNAME'] ?? 'noreply@haarlemfestival.nl'));
+            $fromName = trim((string)($_ENV['MAIL_FROM_NAME'] ?? 'Haarlem Festival'));
+
+            $mail->setFrom($fromAddress, $fromName);
+            $mail->addAddress($to);
+            $mail->CharSet = 'UTF-8';
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $html;
+            $mail->AltBody = self::toPlainText($html);
+
+            foreach ($attachments as $attachment) {
+                $mail->addStringAttachment(
+                    $attachment['content'],
+                    $attachment['filename'],
+                    PHPMailer::ENCODING_BASE64,
+                    $attachment['mime']
+                );
+            }
+
+            return $mail->send();
+        } catch (PHPMailerException $e) {
+            error_log('SMTP email error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * @param array<int, array{filename:string,content:string,mime:string}> $attachments
+     */
+    private static function sendViaMail(string $to, string $subject, string $html, array $attachments): bool
+    {
+        $fromAddress = trim((string)($_ENV['MAIL_FROM_ADDRESS'] ?? 'noreply@haarlemfestival.nl'));
+        $headers = "From: {$fromAddress}\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
 
@@ -175,20 +274,14 @@ HTML;
             $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
         }
 
-        try {
-            $result = mail($to, $subject, $body, $headers);
+        return mail($to, $subject, $body, $headers);
+    }
 
-            if ($result) {
-                error_log("Email sent to {$to}: {$subject}");
-            } else {
-                error_log("Failed to send email to {$to}: {$subject}");
-            }
-
-            return $result;
-        } catch (\Throwable $e) {
-            error_log('Email error: ' . $e->getMessage());
-            return false;
-        }
+    private static function toPlainText(string $html): string
+    {
+        $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = preg_replace('/\s+/', ' ', $text) ?? '';
+        return trim($text);
     }
 
     private static function buildInvoicePdf(array $order): ?string
@@ -223,6 +316,23 @@ HTML;
         $orderId = (int)$order['id'];
         $totalAmount = number_format((float)$order['total_amount'], 2);
 
+        // Load and encode logo
+        $logoPath = __DIR__ . '/../../public/assets/images/logo_haarlem_festival.png';
+        $logoBase64 = '';
+        if (file_exists($logoPath)) {
+            $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+        }
+
+        // Generate QR Code PNG
+        $qrData = "Order #" . $orderId . " | " . htmlspecialchars_decode($customerEmail);
+        $options = new QROptions([
+            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+            'imageBase64' => false,
+        ]);
+        $qrCode = new QRCode($options);
+        $qrPng = $qrCode->render($qrData);
+        $qrBase64 = 'data:image/png;base64,' . base64_encode($qrPng);
+
         $rows = '';
         foreach (($order['items'] ?? []) as $item) {
             $eventTitle = htmlspecialchars((string)($item['event_title'] ?? ''), ENT_QUOTES, 'UTF-8');
@@ -230,12 +340,11 @@ HTML;
             $quantity = (int)($item['quantity'] ?? 0);
             $unitPrice = (float)($item['price_at_purchase'] ?? 0);
             $lineTotal = $quantity * $unitPrice;
-            $eventDate = new \DateTime((string)($item['event_date'] ?? date('Y-m-d')));
 
+            $itemDescription = $eventTitle . ' - ' . $ticketType;
+            
             $rows .= '<tr>';
-            $rows .= '<td>' . $eventTitle . '</td>';
-            $rows .= '<td>' . $ticketType . '</td>';
-            $rows .= '<td style="text-align:center;">' . $eventDate->format('Y-m-d') . '</td>';
+            $rows .= '<td>' . $itemDescription . '</td>';
             $rows .= '<td style="text-align:center;">' . $quantity . '</td>';
             $rows .= '<td style="text-align:right;">EUR ' . number_format($unitPrice, 2) . '</td>';
             $rows .= '<td style="text-align:right;">EUR ' . number_format($lineTotal, 2) . '</td>';
@@ -248,54 +357,243 @@ HTML;
   <meta charset="UTF-8">
   <title>Invoice</title>
   <style>
-    body { font-family: DejaVu Sans, Arial, sans-serif; color: #1f2937; font-size: 12px; }
-    .header { margin-bottom: 20px; }
-    .title { font-size: 26px; color: #0f5ea7; margin: 0; }
-    .meta { margin-top: 4px; color: #4b5563; }
-    .section { margin: 14px 0; }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #f3f4f6; text-align: left; border: 1px solid #d1d5db; padding: 8px; }
-    td { border: 1px solid #d1d5db; padding: 8px; }
-    .totals { margin-top: 16px; width: 45%; margin-left: auto; }
-    .totals td { border: none; padding: 4px 0; }
-    .totals .label { text-align: left; color: #4b5563; }
-    .totals .value { text-align: right; }
-    .totals .grand { border-top: 1px solid #9ca3af; font-weight: bold; padding-top: 8px; }
+    body { 
+      font-family: DejaVu Sans, Arial, sans-serif; 
+      color: #2d2d2d; 
+      font-size: 11px; 
+      margin: 0; 
+      padding: 30px; 
+      background-color: #f5f3f0;
+    }
+    .invoice-box { 
+      background: white; 
+      padding: 40px; 
+      max-width: 800px; 
+      margin: 0 auto; 
+    }
+    .top-section { 
+      display: table; 
+      width: 100%; 
+      margin-bottom: 40px; 
+    }
+    .logo-cell { 
+      display: table-cell; 
+      width: 50%; 
+      vertical-align: middle; 
+    }
+    .logo-cell img { 
+      height: 80px; 
+    }
+    .invoice-title { 
+      display: table-cell; 
+      width: 50%; 
+      text-align: right; 
+      vertical-align: middle; 
+    }
+    .invoice-title h1 { 
+      font-size: 42px; 
+      margin: 0; 
+      font-weight: 400; 
+      letter-spacing: 2px; 
+    }
+    .info-section { 
+      display: table; 
+      width: 100%; 
+      margin-bottom: 30px; 
+      border-bottom: 1px solid #ddd; 
+      padding-bottom: 20px; 
+    }
+    .bill-to { 
+      display: table-cell; 
+      width: 50%; 
+      vertical-align: top; 
+    }
+    .bill-to-label { 
+      font-weight: bold; 
+      font-size: 12px; 
+      margin-bottom: 8px; 
+    }
+    .bill-to-details { 
+      line-height: 1.6; 
+    }
+    .invoice-details { 
+      display: table-cell; 
+      width: 50%; 
+      text-align: right; 
+      vertical-align: top; 
+    }
+    .invoice-details div { 
+      line-height: 1.6; 
+    }
+    table.items { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-bottom: 20px; 
+    }
+    table.items thead th { 
+      background: #f8f8f8; 
+      text-align: left; 
+      padding: 12px; 
+      border-bottom: 2px solid #ddd; 
+      font-weight: 600; 
+      font-size: 11px; 
+    }
+    table.items tbody td { 
+      padding: 12px; 
+      border-bottom: 1px solid #eee; 
+    }
+    table.items thead th:last-child,
+    table.items tbody td:last-child { 
+      text-align: right; 
+    }
+    .totals-section { 
+      margin-top: 30px; 
+      display: table; 
+      width: 100%; 
+    }
+    .qr-side { 
+      display: table-cell; 
+      width: 50%; 
+      vertical-align: top; 
+    }
+    .qr-side img { 
+      width: 100px; 
+      height: 100px; 
+      border: 1px solid #ddd; 
+    }
+    .totals-side { 
+      display: table-cell; 
+      width: 50%; 
+      text-align: right; 
+      vertical-align: top; 
+    }
+    .totals-table { 
+      display: inline-block; 
+      min-width: 250px; 
+      text-align: right; 
+    }
+    .totals-table .row { 
+      padding: 8px 0; 
+      display: table; 
+      width: 100%; 
+    }
+    .totals-table .row.total { 
+      border-top: 2px solid #333; 
+      font-weight: bold; 
+      font-size: 16px; 
+      margin-top: 8px; 
+      padding-top: 12px; 
+    }
+    .totals-table .label { 
+      display: table-cell; 
+      text-align: left; 
+      padding-right: 30px; 
+    }
+    .totals-table .value { 
+      display: table-cell; 
+      text-align: right; 
+    }
+    .thank-you { 
+      margin: 40px 0 30px 0; 
+      font-size: 18px; 
+      font-weight: 500; 
+    }
+    .footer { 
+      margin-top: 50px; 
+      padding-top: 20px; 
+      border-top: 1px solid #eee; 
+      display: table; 
+      width: 100%; 
+      font-size: 10px; 
+      color: #666; 
+    }
+    .footer-left { 
+      display: table-cell; 
+      width: 50%; 
+    }
+    .footer-right { 
+      display: table-cell; 
+      width: 50%; 
+      text-align: right; 
+    }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1 class="title">Invoice</h1>
-    <div class="meta">Order #' . $orderId . ' | Date: ' . $orderDate->format('Y-m-d') . '</div>
+  <div class="invoice-box">
+    <div class="top-section">
+      <div class="logo-cell">
+        ' . ($logoBase64 ? '<img src="' . $logoBase64 . '" alt="Haarlem Festival">' : '') . '
+      </div>
+      <div class="invoice-title">
+        <h1>INVOICE</h1>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="bill-to">
+        <div class="bill-to-label">BILLED TO:</div>
+        <div class="bill-to-details">
+          ' . $customerName . '<br>
+          ' . $customerEmail . '
+        </div>
+      </div>
+      <div class="invoice-details">
+        <div><strong>Invoice No.</strong> ' . $orderId . '</div>
+        <div>' . $orderDate->format('d F Y') . '</div>
+      </div>
+    </div>
+
+    <table class="items">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th style="text-align:center;">Quantity</th>
+          <th style="text-align:right;">Unit Price</th>
+          <th style="text-align:right;">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ' . $rows . '
+      </tbody>
+    </table>
+
+    <div class="totals-section">
+      <div class="qr-side">
+        <img src="' . $qrBase64 . '" alt="Order QR Code">
+      </div>
+      <div class="totals-side">
+        <div class="totals-table">
+          <div class="row">
+            <div class="label">Subtotal</div>
+            <div class="value">EUR ' . $totalAmount . '</div>
+          </div>
+          <div class="row">
+            <div class="label">Tax (0%)</div>
+            <div class="value">EUR 0.00</div>
+          </div>
+          <div class="row total">
+            <div class="label">Total</div>
+            <div class="value">EUR ' . $totalAmount . '</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="thank-you">Thank you!</div>
+
+    <div class="footer">
+      <div class="footer-left">
+        <strong>PAYMENT INFORMATION</strong><br>
+        Payment processed via Stripe<br>
+        Order confirmation sent to ' . $customerEmail . '
+      </div>
+      <div class="footer-right">
+        <strong>Haarlem Festival</strong><br>
+        festivalhaarlem44@gmail.com<br>
+        www.haarlemfestival.nl
+      </div>
+    </div>
   </div>
-
-  <div class="section">
-    <strong>Bill To</strong><br>
-    ' . $customerName . '<br>
-    ' . $customerEmail . '
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Event</th>
-        <th>Ticket</th>
-        <th style="text-align:center;">Date</th>
-        <th style="text-align:center;">Qty</th>
-        <th style="text-align:right;">Unit Price</th>
-        <th style="text-align:right;">Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-      ' . $rows . '
-    </tbody>
-  </table>
-
-  <table class="totals">
-    <tr><td class="label">Subtotal</td><td class="value">EUR ' . $totalAmount . '</td></tr>
-    <tr><td class="label">Tax</td><td class="value">EUR 0.00</td></tr>
-    <tr><td class="label grand">Total</td><td class="value grand">EUR ' . $totalAmount . '</td></tr>
-  </table>
 </body>
 </html>';
     }

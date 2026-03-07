@@ -17,6 +17,12 @@ services:
       - .:/app
     depends_on:
       - mysql
+      - mailhog
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "8025:8025"
 
   mysql:
     image: mariadb:11
