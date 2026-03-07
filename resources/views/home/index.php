@@ -27,7 +27,7 @@ declare(strict_types=1);
     <div class="hero-panel-title">Next events</div>
 
     <?php if (empty($events)): ?>
-        <p class="muted" style="margin:0;">No upcoming events yet.</p>
+        <p class="muted mb-0">No upcoming events yet.</p>
     <?php else: ?>
         <ul class="hero-list">
             <?php foreach (array_slice($events, 0, 3) as $e): ?>

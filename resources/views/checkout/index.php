@@ -13,26 +13,26 @@ $stripe_key = $_ENV['STRIPE_PUBLIC_KEY'] ?? '';
 <h1>Checkout Review</h1>
 <p>Review your order before payment.</p>
 
-<table style="width:100%; border-collapse: collapse; margin-bottom:20px;">
+<table class="data-table">
     <thead>
         <tr>
-            <th style="text-align:left; border-bottom:1px solid #ddd; padding:8px;">Event</th>
-            <th style="text-align:left; border-bottom:1px solid #ddd; padding:8px;">Ticket</th>
-            <th style="text-align:left; border-bottom:1px solid #ddd; padding:8px;">Date</th>
-            <th style="text-align:right; border-bottom:1px solid #ddd; padding:8px;">Qty</th>
-            <th style="text-align:right; border-bottom:1px solid #ddd; padding:8px;">Price</th>
-            <th style="text-align:right; border-bottom:1px solid #ddd; padding:8px;">Line Total</th>
+            <th class="text-left">Event</th>
+            <th class="text-left">Ticket</th>
+            <th class="text-left">Date</th>
+            <th class="text-right">Qty</th>
+            <th class="text-right">Price</th>
+            <th class="text-right">Line Total</th>
         </tr>
     </thead>
     <tbody>
         <?php foreach ($lines as $line): ?>
             <tr>
-                <td style="padding:8px; border-bottom:1px solid #f0f0f0;"><?= h($line['event_title']) ?></td>
-                <td style="padding:8px; border-bottom:1px solid #f0f0f0;"><?= h($line['ticket_type']) ?></td>
-                <td style="padding:8px; border-bottom:1px solid #f0f0f0;"><?= h($line['event_date']) ?></td>
-                <td style="padding:8px; border-bottom:1px solid #f0f0f0; text-align:right;"><?= (int)$line['quantity'] ?></td>
-                <td style="padding:8px; border-bottom:1px solid #f0f0f0; text-align:right;">€<?= number_format((float)$line['price'], 2) ?></td>
-                <td style="padding:8px; border-bottom:1px solid #f0f0f0; text-align:right;">€<?= number_format((float)$line['line_total'], 2) ?></td>
+                <td><?= h($line['event_title']) ?></td>
+                <td><?= h($line['ticket_type']) ?></td>
+                <td><?= h($line['event_date']) ?></td>
+                <td class="text-right"><?= (int)$line['quantity'] ?></td>
+                <td class="text-right">€<?= number_format((float)$line['price'], 2) ?></td>
+                <td class="text-right">€<?= number_format((float)$line['line_total'], 2) ?></td>
             </tr>
         <?php endforeach; ?>
     </tbody>
@@ -41,25 +41,22 @@ $stripe_key = $_ENV['STRIPE_PUBLIC_KEY'] ?? '';
 <p><strong>Order Total: €<?= number_format($total, 2) ?></strong></p>
 
 <?php if ($order_id && $stripe_key): ?>
-    <div style="margin-top:20px; border-top:1px solid #f0f0f0; padding-top:20px;">
+    <div class="info-box mt-3">
         <h2>Payment</h2>
         <p>Click the button below to proceed to secure payment with Stripe.</p>
         
-        <form method="POST" action="/payment/checkout?order_id=<?= urlencode((string)$order_id) ?>" style="margin-top:12px;">
-            <button 
-                type="submit" 
-                style="background-color:#5469D4; color:white; padding:10px 20px; border:none; border-radius:4px; cursor:pointer; font-size:16px;"
-            >
+        <form method="POST" action="/payment/checkout?order_id=<?= urlencode((string)$order_id) ?>" class="mt-2">
+            <button type="submit" class="btn btn-primary font-lg">
                 Proceed to Payment
             </button>
         </form>
     </div>
 <?php else: ?>
-    <div style="margin-top:20px; padding:12px; background-color:#fff3cd; border:1px solid #ffeaa7; border-radius:4px;">
-        <p style="margin:0; color:#856404;"><strong>Payment Service</strong> is not currently available. Please try again later.</p>
+    <div class="alert alert-warning mt-3">
+        <p class="mb-0"><strong>Payment Service</strong> is not currently available. Please try again later.</p>
     </div>
 <?php endif; ?>
 
-<div style="margin-top:12px;">
-    <a href="/cart" style="text-decoration:none; color:#5469D4;">Back to cart</a>
+<div class="mt-2">
+    <a href="/cart" class="link-primary">Back to cart</a>
 </div>

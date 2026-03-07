@@ -13,7 +13,7 @@ $seconds = $remaining_time % 60;
 
 <h1>Your Profile</h1>
 
-<div style="max-width:600px; padding:20px; background:#f5f5f5; border-radius:8px;">
+<div class="profile-box">
     <h2>Account Information</h2>
     
     <p>
@@ -22,7 +22,7 @@ $seconds = $remaining_time % 60;
     
     <p>
         <strong>Role:</strong> 
-        <span style="text-transform:capitalize;">
+        <span class="text-capitalize">
             <?= htmlspecialchars($user['role'], ENT_QUOTES, 'UTF-8') ?>
         </span>
     </p>
@@ -31,7 +31,7 @@ $seconds = $remaining_time % 60;
         <strong>Session Remaining:</strong> 
         <code><?= sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds) ?></code>
         <br>
-        <small style="color:#666;">
+        <small class="form-hint">
             Your session will expire after 1 hour of inactivity.
         </small>
     </p>
@@ -41,20 +41,20 @@ $seconds = $remaining_time % 60;
         <span id="member-since">Today</span>
     </p>
     
-    <hr style="margin:20px 0;">
+    <hr class="hr-divider">
     
     <h3>Security</h3>
     
     <p>
-        <a href="/profile/change-password" style="color:#0066cc; text-decoration:none;">
+        <a href="/profile/change-password" class="link-primary">
             Change Password
         </a>
     </p>
     
     <p>
-        <form method="POST" action="/logout" style="display:inline;">
+        <form method="POST" action="/logout" class="d-inline">
             <?= Csrf::field() ?>
-            <button type="submit" style="background:#dc3545; color:white; padding:8px 16px; border:none; border-radius:4px; cursor:pointer;">
+            <button type="submit" class="btn btn-danger">
                 Logout
             </button>
         </form>

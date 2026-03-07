@@ -21,8 +21,8 @@ $action = $isEdit
 <p><a href="/admin/events">← Back to events</a></p>
 
 <?php if (!empty($errors)): ?>
-    <div style="border:1px solid #c00; padding:12px; margin:12px 0;">
-        <ul style="margin:0; padding-left:18px;">
+    <div class="alert alert-error">
+        <ul class="list-default">
             <?php foreach ($errors as $err): ?>
                 <li><?= h($err) ?></li>
             <?php endforeach; ?>
@@ -34,22 +34,15 @@ $action = $isEdit
      <?= \App\Framework\Csrf::field() ?>
 
     <!-- Title -->
-    <div style="margin:10px 0;">
-        <label>Title</label><br>
-        <input
-            type="text"
-            name="title"
-            value="<?= h((string)($event['title'] ?? '')) ?>"
-            required
-            style="width: 320px;"
-        >
+    <div class="form-group">
+        <label class="form-label">Title</label>
+        <input type="text" name="title" value="<?= h((string)($event['title'] ?? '')) ?>" required class="form-input" style="width: 320px;">
     </div>
 
     <!-- Category (DROPDOWN) -->
-    <div style="margin:10px 0;">
-        <label>Category</label><br>
-
-        <select name="category" required style="width: 332px;">
+    <div class="form-group">
+        <label class="form-label">Category</label>
+        <select name="category" required class="form-input" style="width: 332px;">
             <option value="">-- select category --</option>
 
             <?php foreach ($categories as $c): ?>
@@ -62,8 +55,8 @@ $action = $isEdit
     </div>
 
     <!-- Date -->
-    <div style="margin:10px 0;">
-        <label>Date (YYYY-MM-DD)</label><br>
+    <div class="form-group">
+        <label class="form-label">Date (YYYY-MM-DD)</label>
         <input
             type="date"
             name="event_date"

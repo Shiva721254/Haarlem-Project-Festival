@@ -25,7 +25,7 @@ use App\Framework\Csrf;
 
 <?php if (!empty($errors)): ?>
   <div class="flash flash-error">
-    <ul style="margin: 0; padding-left: 20px;">
+    <ul class="list-default">
       <?php foreach ($errors as $err): ?>
         <li><?= htmlspecialchars($err, ENT_QUOTES, 'UTF-8') ?></li>
       <?php endforeach; ?>
@@ -33,50 +33,42 @@ use App\Framework\Csrf;
   </div>
 <?php endif; ?>
 
-<form method="POST" action="/register" style="max-width:500px;">
+<form method="POST" action="/register" class="auth-container">
   <?= Csrf::field() ?>
 
-  <div style="margin-bottom:12px;">
-    <label for="first_name">First Name *</label><br>
-    <input id="first_name" type="text" name="first_name" required 
-           style="width:100%; padding:8px;" 
-           value="<?= htmlspecialchars($old['first_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+  <div class="form-group">
+    <label for="first_name" class="form-label">First Name *</label>
+    <input id="first_name" type="text" name="first_name" required class="form-input" value="<?= htmlspecialchars($old['first_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
   </div>
 
-  <div style="margin-bottom:12px;">
-    <label for="last_name">Last Name *</label><br>
-    <input id="last_name" type="text" name="last_name" required 
-           style="width:100%; padding:8px;"
-           value="<?= htmlspecialchars($old['last_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+  <div class="form-group">
+    <label for="last_name" class="form-label">Last Name *</label>
+    <input id="last_name" type="text" name="last_name" required class="form-input" value="<?= htmlspecialchars($old['last_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
   </div>
 
-  <div style="margin-bottom:12px;">
-    <label for="email">Email *</label><br>
-    <input id="email" type="email" name="email" required 
-           style="width:100%; padding:8px;"
-           value="<?= htmlspecialchars($old['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+  <div class="form-group">
+    <label for="email" class="form-label">Email *</label>
+    <input id="email" type="email" name="email" required class="form-input" value="<?= htmlspecialchars($old['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
   </div>
 
-  <div style="margin-bottom:12px;">
-    <label for="password">Password *</label><br>
-    <input id="password" type="password" name="password" required 
-           style="width:100%; padding:8px;">
-    <small style="color:#666; display:block; margin-top:4px;">
+  <div class="form-group">
+    <label for="password" class="form-label">Password *</label>
+    <input id="password" type="password" name="password" required class="form-input">
+    <small class="form-hint">
       Must be 8+ characters with uppercase, lowercase, number, and special character
     </small>
   </div>
 
-  <div style="margin-bottom:12px;">
-    <label for="password_confirm">Confirm Password *</label><br>
-    <input id="password_confirm" type="password" name="password_confirm" required 
-           style="width:100%; padding:8px;">
+  <div class="form-group mb-3">
+    <label for="password_confirm" class="form-label">Confirm Password *</label>
+    <input id="password_confirm" type="password" name="password_confirm" required class="form-input">
   </div>
 
-  <button type="submit" style="padding:10px 20px; cursor:pointer;">
+  <button type="submit" class="btn btn-primary">
     Create Account
   </button>
   
-  <p style="margin-top:15px;">
-    Already have an account? <a href="/login">Login here</a>
+  <p class="mt-2">
+    Already have an account? <a href="/login" class="link-primary">Login here</a>
   </p>
 </form>

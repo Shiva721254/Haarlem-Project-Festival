@@ -42,7 +42,7 @@
 
                                 <dt class="col-sm-5">Total:</dt>
                                 <dd class="col-sm-7">
-                        <strong class="text-success" style="font-size: 1.25rem;">
+                        <strong class="text-success font-lg">
                             &euro;<?= h(number_format((float)$order['total_amount'], 2)) ?>
                         </strong>
                                 </dd>
