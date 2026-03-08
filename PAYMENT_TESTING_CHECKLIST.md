@@ -96,7 +96,7 @@ After testing each card:
   ```
 
 - [ ] **Email Sent**: Check if confirmation email was sent (successful payments only)
-  - Check MailHog: http://localhost:8025
+  - Check Gmail inbox (SMTP sender: festivalhaarlem44@gmail.com)
 
 - [ ] **PDF Invoice**: Email contains PDF attachment with QR code
 
@@ -107,6 +107,30 @@ After testing each card:
   JOIN events e ON t.event_id = e.id
   WHERE e.id = [EVENT_ID];
   ```
+
+---
+
+## Stripe Scenario Execution Status (Current)
+
+As of 2026-03-08, based on database evidence:
+
+| Scenario | Card | Status | Evidence |
+|---|---|---|---|
+| 1. Successful Payment | 4242 4242 4242 4242 | ✅ PASS (success path verified) | `orders.status='completed'` with non-null `stripe_payment_intent_id` (6 records) |
+| 2. 3D Secure Required | 4000 0025 0000 3155 | ⏳ Not yet explicitly verified | Need one dedicated run showing Stripe 3DS challenge + successful completion |
+| 3. Declined (Generic) | 4000 0000 0000 0002 | ⏳ Not yet card-specific | Failure path exists (`pending` + null payment intent), but this exact card not yet confirmed |
+| 4. Insufficient Funds | 4000 0000 0000 9995 | ⏳ Not yet card-specific | Failure path exists (`pending` + null payment intent), but this exact card not yet confirmed |
+| 5. Expired Card | 4000 0000 0000 0069 | ⏳ Not yet card-specific | Not explicitly executed/recorded with this test card |
+| 6. Incorrect CVC | 4000 0000 0000 0127 | ⏳ Not yet card-specific | Not explicitly executed/recorded with this test card |
+
+DB snapshot used:
+- `completed_with_pi = 6`
+- `pending_without_pi = 6`
+
+Recommended to fully close Stripe testing:
+1. Run scenario 2 once and capture 3DS challenge screenshot/notes.
+2. Run scenarios 3-6 once each and note exact Stripe error message shown.
+3. Record corresponding latest order status after each run.
 
 ---
 
@@ -131,6 +155,47 @@ Description: <img src=x onerror=alert('XSS')>
 ### CSRF Test
 1. Create a form on external site posting to: http://localhost:8000/cart/add
 2. **Expected**: Request rejected (missing CSRF token)
+
+---
+
+## Security Test Results (Executed)
+
+### SQL Injection
+- Date: 2026-03-08
+- Payload tested: `admin' OR '1'='1' --` (login)
+- Result: PASS
+- Evidence:
+  - HTTP-level login test stayed on `/login` (no auth bypass)
+  - Repository lookup with payload returned `NULL`
+  - `users` table count unchanged (`4`)
+
+### XSS (Stored)
+- Date: 2026-03-08
+- Payload tested: `<script>alert('XSSPROBE20260308')</script>` in event title
+- Result: PASS
+- Evidence:
+  - `RAW_PRESENT=False` on `/schedule`
+  - `ESCAPED_PRESENT=True` on `/schedule`
+  - Output escaped through `h()` / `htmlspecialchars`
+  - Temporary probe row removed after test
+
+### CSRF
+- Date: 2026-03-08
+- Endpoints tested: `/cart/add`, `/login`
+- Result: PASS
+- Evidence:
+  - Missing token requests rejected
+  - CSRF error message shown to user
+  - Security log contains `auth.login.csrf_failed`
+
+### File Upload Security
+- Date: 2026-03-08
+- Result: N/A (no backend file upload endpoint currently exposed)
+- Evidence:
+  - No server-side `$_FILES` handling found
+  - No `move_uploaded_file` usage found
+  - `storage/uploads/` contains only `.gitkeep`
+  - Existing `type="file"` input in admin check-in is client-side camera picker only
 
 ---
 
@@ -170,7 +235,6 @@ GROUP BY e.id, e.title;
 ✅ **Sample Data**: Comprehensive seed file created
 
 **Next Tasks**:
-1. Test all Stripe payment scenarios
+1. Finish card-specific Stripe scenarios (2-6) and capture exact results
 2. Verify email delivery for each successful payment
-3. Test security vulnerabilities (SQL injection, XSS, CSRF)
-4. Create technical documentation (ERD, UML diagrams)
+3. Create technical documentation (ERD, UML diagrams)
